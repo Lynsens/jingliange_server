@@ -1,0 +1,35 @@
+basePath: /api/v1
+definitions:
+  app.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      msg:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: This is the backend API for Jingliange.
+  termsOfService: TO IMPLEMENT
+  title: Jingliange Server API
+  version: "1.0"
+paths:
+  /api/v1/getDescription:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Retrieve the description of Jingliange
+schemes:
+- http
+swagger: "2.0"
