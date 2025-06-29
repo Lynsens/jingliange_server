@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `jlg`.`activity` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '流水ID,自增序列号',
   `title` varchar(64) NOT NULL DEFAULT '' COMMENT '标题',
   `content` varchar(512) NOT NULL DEFAULT '' COMMENT '活动介绍',
+  `img` varchar(32) NOT NULL DEFAULT '' COMMENT '活动图片地址',
   `status` int(8) unsigned NOT NULL DEFAULT '0' COMMENT '状态：0 删除，1 正常',
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '记录创建时间',
   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '记录更新时间',
@@ -21,8 +22,10 @@ CREATE TABLE IF NOT EXISTS `jlg`.`activity` (
 
 CREATE TABLE IF NOT EXISTS `jlg`.`images` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '流水ID,自增序列号',
-  `address` varchar(64) NOT NULL DEFAULT '' COMMENT '图片保存地址',
+  `address` varchar(256) NOT NULL DEFAULT '' COMMENT '图片保存地址',
   `desc` varchar(512) NOT NULL DEFAULT '' COMMENT '图片简介',
+  `top_pic` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否为头图：0 否，1 是',
+  `type` int(8) unsigned NOT NULL DEFAULT '0' COMMENT '图片类型：0 活动，1 餐厅介绍',
   `status` int(8) unsigned NOT NULL DEFAULT '0' COMMENT '状态：0 删除，1 正常',
   `create_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '记录创建时间',
   `update_time` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '记录更新时间',

@@ -8,6 +8,37 @@ definitions:
       msg:
         type: string
     type: object
+  model.Image:
+    properties:
+      address:
+        example: /images/example.jpg
+        type: string
+      create_time:
+        description: Creation time
+        example: "2023-10-01T12:00:00Z"
+        type: string
+      desc:
+        example: A beautiful image
+        type: string
+      id:
+        example: 1
+        type: integer
+      status:
+        description: 'Status: 0 deleted, 1 normal'
+        example: 1
+        type: integer
+      top_pic:
+        description: Whether it is a top image
+        type: integer
+      type:
+        description: 'Image type: 0 activity, 1 restaurant introduction'
+        example: 0
+        type: integer
+      update_time:
+        description: Update time
+        example: "2023-10-01T12:00:00Z"
+        type: string
+    type: object
 host: localhost:8000
 info:
   contact: {}
@@ -16,6 +47,33 @@ info:
   title: Jingliange Server API
   version: "1.0"
 paths:
+  /api/v1/getActivityList:
+    post:
+      description: 获取净莲阁的活动列表，输入时间戳
+      parameters:
+      - default: 0
+        description: 时间戳
+        in: query
+        name: timestamp
+        required: true
+        type: integer
+      - default: 0
+        description: 页码, 从零开始
+        in: query
+        name: pageNumber
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 获取活动列表
   /api/v1/getDescription:
     get:
       produces:
@@ -29,7 +87,84 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/app.Response'
-      summary: Retrieve the description of Jingliange
+      summary: 获取净莲阁介绍
+  /api/v1/getImageList:
+    post:
+      description: 获取净莲阁的图片列表。返回图片地址、简介、是否为头图等信息。类型为 0 表示活动图片，1 表示餐厅介绍图片。
+      parameters:
+      - default: 0
+        description: 图片类型：0 活动，1 餐厅介绍
+        in: query
+        name: type
+        type: integer
+      - default: 0
+        description: 是否为头图：0 否，1 是
+        in: query
+        name: top_pic
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回图片列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Image'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 获取图片列表
+  /api/v1/uploadImage:
+    post:
+      description: 上传净莲阁的图片。支持图片格式检查和大小限制，返回图片的访问地址、保存路径和文件名。
+      parameters:
+      - description: 图片文件
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: 图片描述
+        in: formData
+        name: desc
+        type: string
+      - description: 是否为头图：0 否，1 是
+        in: formData
+        name: top_pic
+        type: integer
+      - description: 图片类型：0 活动，1 餐厅介绍
+        in: formData
+        name: type
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  additionalProperties:
+                    type: string
+                  type: object
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 上传图片
 schemes:
 - http
 swagger: "2.0"

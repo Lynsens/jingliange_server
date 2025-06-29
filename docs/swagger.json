@@ -13,12 +13,30 @@
     "host": "localhost:8000",
     "basePath": "/api/v1",
     "paths": {
-        "/api/v1/getDescription": {
-            "get": {
+        "/api/v1/getActivityList": {
+            "post": {
+                "description": "获取净莲阁的活动列表，输入时间戳",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Retrieve the description of Jingliange",
+                "summary": "获取活动列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "时间戳",
+                        "name": "timestamp",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "页码, 从零开始",
+                        "name": "pageNumber",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -28,6 +46,153 @@
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/getDescription": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取净莲阁介绍",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/getImageList": {
+            "post": {
+                "description": "获取净莲阁的图片列表。返回图片地址、简介、是否为头图等信息。类型为 0 表示活动图片，1 表示餐厅介绍图片。",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取图片列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "图片类型：0 活动，1 餐厅介绍",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "是否为头图：0 否，1 是",
+                        "name": "top_pic",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功返回图片列表",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.Image"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/uploadImage": {
+            "post": {
+                "description": "上传净莲阁的图片。支持图片格式检查和大小限制，返回图片的访问地址、保存路径和文件名。",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "上传图片",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "图片文件",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "图片描述",
+                        "name": "desc",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "是否为头图：0 否，1 是",
+                        "name": "top_pic",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "图片类型：0 活动，1 餐厅介绍",
+                        "name": "type",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -46,6 +211,47 @@
                 "data": {},
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "model.Image": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "/images/example.jpg"
+                },
+                "create_time": {
+                    "description": "Creation time",
+                    "type": "string",
+                    "example": "2023-10-01T12:00:00Z"
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "A beautiful image"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "description": "Status: 0 deleted, 1 normal",
+                    "type": "integer",
+                    "example": 1
+                },
+                "top_pic": {
+                    "description": "Whether it is a top image",
+                    "type": "integer"
+                },
+                "type": {
+                    "description": "Image type: 0 activity, 1 restaurant introduction",
+                    "type": "integer",
+                    "example": 0
+                },
+                "update_time": {
+                    "description": "Update time",
+                    "type": "string",
+                    "example": "2023-10-01T12:00:00Z"
                 }
             }
         }

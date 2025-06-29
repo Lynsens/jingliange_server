@@ -92,3 +92,26 @@ func Close() {
 		_ = F.Close()
 	}
 }
+
+type gormWriter struct{}
+
+func (w gormWriter) Printf(format string, args ...interface{}) {
+	switch {
+	case format == "sql" || format == "gorm":
+		Debug(fmt.Sprintf(format, args...))
+	case format == "log":
+		Info(fmt.Sprintf(format, args...))
+	case format == "warn":
+		Warn(fmt.Sprintf(format, args...))
+	case format == "error":
+		Error(fmt.Sprintf(format, args...))
+	case format == "fatal":
+		Fatal(fmt.Sprintf(format, args...))
+	default:
+		Info(fmt.Sprintf(format, args...))
+	}
+}
+
+func NewGormWriter() gormWriter {
+	return gormWriter{}
+}

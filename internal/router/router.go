@@ -2,6 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/lynsens/jingliange_server/internal/router/api"
 	v1 "github.com/lynsens/jingliange_server/internal/router/api/v1"
 	"github.com/lynsens/jingliange_server/pkg/logging"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -29,14 +30,17 @@ func InitRouter() *gin.Engine {
 	// r.StaticFS("/qrcode", http.Dir(qrcode.GetQrCodeFullPath()))
 
 	// r.POST("/auth", api.GetAuth)
-	// r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	// r.POST("/upload", api.UploadImage)
+	r.POST("/uploadImage", api.UploadImage)
 
 	apiv1 := r.Group("/api/v1")
 	// apiv1.Use(jwt.JWT())
 	{
-		//获取标签列表
+		//获取净莲阁介绍
 		apiv1.GET("/getDescription", v1.GetDescription)
+		//获取活动列表
+		apiv1.POST("/getActivityList", v1.GetActivityList)
+		//获取图片列表
+		apiv1.POST("/getImageList", v1.GetImangeList)
 		// //新建标签
 		// apiv1.POST("/tags", v1.AddTag)
 		// //更新指定标签
