@@ -135,7 +135,7 @@ func ParseImgContext(c *gin.Context) (desc string, topPic int, imageType int) {
 func SaveImageToDB(url string, desc string, status int, topPic int, imageType int) error {
 	db, err := repo.ConnectDb()
 	if err != nil {
-		logging.Error("SaveImageToDB: ConnectDb error", err, nil)
+		logging.Error("SaveImageToDB: ConnectDb error", err)
 		return err
 	}
 
@@ -144,6 +144,6 @@ func SaveImageToDB(url string, desc string, status int, topPic int, imageType in
 	if err != nil {
 		return err
 	}
-	logging.Info("SaveImageToDB: Image URL saved successfully", url, nil)
+	logging.Info("SaveImageToDB: Image URL saved successfully", url)
 	return nil
 }

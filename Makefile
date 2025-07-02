@@ -54,6 +54,11 @@ build-dev: dep fmt ## Build  project
 	@go build -v -gcflags=all="-N -l" -o bin/${PROJECT_NAME} cmd/main.go
 	@chmod +x bin/${PROJECT_NAME}
 
+build-linux: dep fmt ## Build project
+	@echo "go build for linux amd64..."
+	GOOS=linux GOARCH=amd64 go build -v -gcflags=all="-N -l" -o bin/${PROJECT_NAME} cmd/main.go
+	@chmod +x bin/${PROJECT_NAME}
+
 run: dep fmt ## Run  project
 	@echo "go run..."
 #   @go run cmd/main.go --config=conf/conf.toml

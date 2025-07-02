@@ -1,10 +1,13 @@
 package routers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lynsens/jingliange_server/internal/router/api"
 	v1 "github.com/lynsens/jingliange_server/internal/router/api/v1"
 	"github.com/lynsens/jingliange_server/pkg/logging"
+	"github.com/lynsens/jingliange_server/pkg/upload"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 
@@ -25,8 +28,8 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.StaticFS("/uploads/images", http.Dir(upload.GetImageFullPath()))
 
-	// r.StaticFS("/upload/images", http.Dir(upload.GetImageFullPath()))
 	// r.StaticFS("/qrcode", http.Dir(qrcode.GetQrCodeFullPath()))
 
 	// r.POST("/auth", api.GetAuth)
