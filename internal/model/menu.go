@@ -24,3 +24,15 @@ type MenuFeedback struct {
 	CreateTime time.Time `gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"` // Creation time
 	UpdateTime time.Time `gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"` // Update time
 }
+
+// MenuQueryRequest 菜单查询请求结构体
+type MenuQueryRequest struct {
+	Name       string `json:"name" example:"紫菜汤"`     // 菜单名称，支持模糊匹配
+	PageSize   int    `json:"pageSize" example:"10"`  // 每页数量
+	PageNumber int    `json:"pageNumber" example:"0"` // 页码，从零开始
+}
+
+// DeleteMenuRequest 删除菜单请求结构体
+type DeleteMenuRequest struct {
+	ID int `json:"id" example:"1"` // 菜品ID
+}

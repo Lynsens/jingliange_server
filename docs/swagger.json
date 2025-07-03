@@ -13,9 +13,12 @@
     "host": "https://jingliange.com",
     "basePath": "/api/v1",
     "paths": {
-        "/api/admin/deleteMenuItem/{id}": {
+        "/api/admin/deleteMenuItem": {
             "delete": {
                 "description": "根据菜品ID删除菜品（软删除，将状态标记为0）",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -25,11 +28,13 @@
                 "summary": "删除菜品",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "菜品ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
+                        "description": "删除参数",
+                        "name": "delete",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DeleteMenuRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -108,7 +113,10 @@
         },
         "/api/v1/about/getActivityList": {
             "post": {
-                "description": "获取净莲阁的活动列表，输入时间戳",
+                "description": "获取净莲阁的活动列表，支持时间戳过滤和分页",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -118,30 +126,45 @@
                 "summary": "获取活动列表",
                 "parameters": [
                     {
-                        "type": "string",
-                        "default": "0",
-                        "description": "时间戳",
-                        "name": "timestamp",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "0",
-                        "description": "页码, 从零开始",
-                        "name": "pageNumber",
-                        "in": "query"
+                        "description": "查询参数",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ActivityQueryRequest"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"title\":\"素食文化活动\",\"content\":\"介绍素食文化\",\"img\":\"/images/activity1.jpg\",\"status\":1}]}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.Activity"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -283,6 +306,9 @@
         "/api/v1/menu/getMenu": {
             "post": {
                 "description": "获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json等信息。输入名称过滤菜单项，支持模糊匹配。",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -292,30 +318,18 @@
                 "summary": "获取净莲阁的菜单",
                 "parameters": [
                     {
-                        "type": "string",
-                        "default": "\"\"",
-                        "description": "菜单名称，支持模糊匹配",
-                        "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "default": "10",
-                        "description": "每页数量",
-                        "name": "pageSize",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "default": "0",
-                        "description": "页码, 从零开始",
-                        "name": "pageNumber",
-                        "in": "query"
+                        "description": "查询参数",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.MenuQueryRequest"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"name\":\"紫菜汤\",\"image_url\":\"/images/menu.jpg\",\"desc\":\"美味的菜品\",\"nutrition\":\"...\",\"ingredients\":\"...\",\"status\":1}]}",
                         "schema": {
                             "allOf": [
                                 {
@@ -325,15 +339,24 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/model.Menu"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.Menu"
+                                            }
                                         }
                                     }
                                 }
                             ]
                         }
                     },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -428,6 +451,60 @@
                 }
             }
         },
+        "model.Activity": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "description": "Creation time",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "img": {
+                    "description": "Image address",
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Update time",
+                    "type": "string"
+                }
+            }
+        },
+        "model.ActivityQueryRequest": {
+            "type": "object",
+            "properties": {
+                "pageNumber": {
+                    "description": "页码，从零开始",
+                    "type": "integer",
+                    "example": 0
+                },
+                "timestamp": {
+                    "description": "时间戳",
+                    "type": "integer",
+                    "example": 0
+                }
+            }
+        },
+        "model.DeleteMenuRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "菜品ID",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "model.Image": {
             "type": "object",
             "properties": {
@@ -510,6 +587,26 @@
                     "description": "Update time",
                     "type": "string",
                     "example": "2012-1-1"
+                }
+            }
+        },
+        "model.MenuQueryRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "菜单名称，支持模糊匹配",
+                    "type": "string",
+                    "example": "紫菜汤"
+                },
+                "pageNumber": {
+                    "description": "页码，从零开始",
+                    "type": "integer",
+                    "example": 0
+                },
+                "pageSize": {
+                    "description": "每页数量",
+                    "type": "integer",
+                    "example": 10
                 }
             }
         }

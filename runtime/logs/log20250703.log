@@ -139,3 +139,19 @@
 [INFO][log.go:111]2025/07/03 22:10:30 /Users/mye/Git/jingliange_server/internal/repo/menu.go:27
 [44.899ms] [rows:2] SELECT * FROM `menu` WHERE status = 1 AND ((name LIKE '%紫菜%' OR `desc` LIKE '%紫菜%')) LIMIT 10
 [GIN] 2025/07/03 - 22:10:30 | 200 |  173.673208ms |             ::1 | POST     "/api/v1/menu/getMenu?pageSize=10&pageNumber=0&name=%E7%B4%AB%E8%8F%9C"
+[GIN] 2025/07/03 - 22:22:46 | 200 |     661.125µs |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/03 - 22:22:46 | 200 |     275.416µs |             ::1 | GET      "/swagger/swagger-ui.css"
+[GIN] 2025/07/03 - 22:22:46 | 200 |     342.459µs |             ::1 | GET      "/swagger/swagger-ui-standalone-preset.js"
+[GIN] 2025/07/03 - 22:22:46 | 200 |    4.878583ms |             ::1 | GET      "/swagger/swagger-ui-bundle.js"
+[GIN] 2025/07/03 - 22:22:46 | 200 |     294.791µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/03 - 22:22:46 | 200 |    2.950916ms |             ::1 | GET      "/swagger/favicon-32x32.png"
+[GIN] 2025/07/03 - 22:26:55 | 200 |     356.084µs |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/03 - 22:26:55 | 200 |     193.459µs |             ::1 | GET      "/swagger/swagger-ui.css"
+[GIN] 2025/07/03 - 22:26:55 | 200 |     390.375µs |             ::1 | GET      "/swagger/swagger-ui-standalone-preset.js"
+[GIN] 2025/07/03 - 22:26:55 | 200 |    2.038917ms |             ::1 | GET      "/swagger/swagger-ui-bundle.js"
+[GIN] 2025/07/03 - 22:26:55 | 200 |      192.25µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/03 - 22:26:55 | 200 |    1.071625ms |             ::1 | GET      "/swagger/favicon-32x32.png"
+[GIN] 2025/07/03 - 22:31:34 | 404 |         916ns |             ::1 | POST     "/api/v1/getActivityList"
+[INFO][log.go:111]2025/07/03 22:32:24 /Users/mye/Git/jingliange_server/internal/repo/about.go:34
+[44.336ms] [rows:3] SELECT * FROM `activity` WHERE status = 1 AND create_time > 0 ORDER BY create_time DESC LIMIT 10
+[GIN] 2025/07/03 - 22:32:24 | 200 |  181.872375ms |             ::1 | POST     "/api/v1/about/getActivityList"

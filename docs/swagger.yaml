@@ -8,6 +8,44 @@ definitions:
       msg:
         type: string
     type: object
+  model.Activity:
+    properties:
+      content:
+        type: string
+      createTime:
+        description: Creation time
+        type: string
+      id:
+        type: integer
+      img:
+        description: Image address
+        type: string
+      status:
+        type: integer
+      title:
+        type: string
+      updateTime:
+        description: Update time
+        type: string
+    type: object
+  model.ActivityQueryRequest:
+    properties:
+      pageNumber:
+        description: 页码，从零开始
+        example: 0
+        type: integer
+      timestamp:
+        description: 时间戳
+        example: 0
+        type: integer
+    type: object
+  model.DeleteMenuRequest:
+    properties:
+      id:
+        description: 菜品ID
+        example: 1
+        type: integer
+    type: object
   model.Image:
     properties:
       address:
@@ -72,6 +110,21 @@ definitions:
         example: "2012-1-1"
         type: string
     type: object
+  model.MenuQueryRequest:
+    properties:
+      name:
+        description: 菜单名称，支持模糊匹配
+        example: 紫菜汤
+        type: string
+      pageNumber:
+        description: 页码，从零开始
+        example: 0
+        type: integer
+      pageSize:
+        description: 每页数量
+        example: 10
+        type: integer
+    type: object
 host: https://jingliange.com
 info:
   contact: {}
@@ -80,15 +133,18 @@ info:
   title: Jingliange Server API
   version: "1.0"
 paths:
-  /api/admin/deleteMenuItem/{id}:
+  /api/admin/deleteMenuItem:
     delete:
+      consumes:
+      - application/json
       description: 根据菜品ID删除菜品（软删除，将状态标记为0）
       parameters:
-      - description: 菜品ID
-        in: path
-        name: id
+      - description: 删除参数
+        in: body
+        name: delete
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/model.DeleteMenuRequest'
       produces:
       - application/json
       responses:
@@ -144,28 +200,36 @@ paths:
       - Menu
   /api/v1/about/getActivityList:
     post:
-      description: 获取净莲阁的活动列表，输入时间戳
+      consumes:
+      - application/json
+      description: 获取净莲阁的活动列表，支持时间戳过滤和分页
       parameters:
-      - default: "0"
-        description: 时间戳
-        in: query
-        name: timestamp
+      - description: 查询参数
+        in: body
+        name: query
         required: true
-        type: string
-      - default: "0"
-        description: 页码, 从零开始
-        in: query
-        name: pageNumber
-        type: string
+        schema:
+          $ref: '#/definitions/model.ActivityQueryRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: '{"code":200,"msg":"ok","data":[{"id":1,"title":"素食文化活动","content":"介绍素食文化","img":"/images/activity1.jpg","status":1}]}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Activity'
+                  type: array
+              type: object
+        "400":
+          description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
           schema:
             $ref: '#/definitions/app.Response'
         "500":
-          description: Internal Server Error
+          description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
             $ref: '#/definitions/app.Response'
       summary: 获取活动列表
@@ -255,37 +319,36 @@ paths:
       summary: 获取图片列表
   /api/v1/menu/getMenu:
     post:
+      consumes:
+      - application/json
       description: 获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json等信息。输入名称过滤菜单项，支持模糊匹配。
       parameters:
-      - default: '""'
-        description: 菜单名称，支持模糊匹配
-        in: query
-        name: name
-        type: string
-      - default: "10"
-        description: 每页数量
-        in: query
-        name: pageSize
-        type: string
-      - default: "0"
-        description: 页码, 从零开始
-        in: query
-        name: pageNumber
-        type: string
+      - description: 查询参数
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/model.MenuQueryRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: '{"code":200,"msg":"ok","data":[{"id":1,"name":"紫菜汤","image_url":"/images/menu.jpg","desc":"美味的菜品","nutrition":"...","ingredients":"...","status":1}]}'
           schema:
             allOf:
             - $ref: '#/definitions/app.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/model.Menu'
+                  items:
+                    $ref: '#/definitions/model.Menu'
+                  type: array
               type: object
+        "400":
+          description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
+          schema:
+            $ref: '#/definitions/app.Response'
         "500":
-          description: Internal Server Error
+          description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
             $ref: '#/definitions/app.Response'
       summary: 获取净莲阁的菜单

@@ -42,3 +42,9 @@ type Image struct {
 func (Image) TableName() string {
 	return "images"
 }
+
+// ActivityQueryRequest 活动查询请求结构体
+type ActivityQueryRequest struct {
+	Timestamp  int `json:"timestamp" example:"0"`  // 时间戳
+	PageNumber int `json:"pageNumber" example:"0"` // 页码，从零开始
+}
