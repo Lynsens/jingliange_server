@@ -16,25 +16,121 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/getActivityList": {
+        "/api/admin/deleteMenuItem/{id}": {
+            "delete": {
+                "description": "根据菜品ID删除菜品（软删除，将状态标记为0）",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "删除菜品",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "菜品ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid menu ID\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/uploadMenuItem": {
+            "post": {
+                "description": "提供菜品的名称、图片url、简介、营养价值表、主要成分，上传到数据库。营养价值表和主要成分需要以JSON字符串格式提供。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "上传菜品",
+                "parameters": [
+                    {
+                        "description": "菜品信息",
+                        "name": "menu",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Menu"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"id\":1,\"name\":\"豆腐汤\",\"image_url\":\"/images/tofusoup.jpg\",\"desc\":\"清淡营养的素食汤品，豆腐嫩滑，口感清香，富含植物蛋白\",\"nutrition\":\"...\",\"ingredients\":\"...\",\"status\":1}}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"All fields are required\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/about/getActivityList": {
             "post": {
                 "description": "获取净莲阁的活动列表，输入时间戳",
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "About"
+                ],
                 "summary": "获取活动列表",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "default": 0,
+                        "type": "string",
+                        "default": "0",
                         "description": "时间戳",
                         "name": "timestamp",
                         "in": "query",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "default": 0,
+                        "type": "string",
+                        "default": "0",
                         "description": "页码, 从零开始",
                         "name": "pageNumber",
                         "in": "query"
@@ -56,10 +152,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/getDescription": {
+        "/api/v1/about/getDescription": {
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "About"
                 ],
                 "summary": "获取净莲阁介绍",
                 "responses": {
@@ -78,9 +177,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/about/getTopImage": {
+            "get": {
+                "description": "获取净莲阁的头图。返回图片地址、简介、是否为头图等信息。",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "About"
+                ],
+                "summary": "获取头图",
+                "responses": {
+                    "200": {
+                        "description": "成功返回头图信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.Image"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/getImageList": {
             "post": {
-                "description": "获取净莲阁的图片列表。返回图片地址、简介、是否为头图等信息。类型为 0 表示活动图片，1 表示餐厅介绍图片。",
+                "description": "获取净莲阁的图片列表。返回图片地址、简介、是否为头图等信息。类型为 0 表示活动图片，1 表示餐厅介绍图片。top_pic 为 1 表示头图，0 表示非头图。",
                 "produces": [
                     "application/json"
                 ],
@@ -98,6 +235,20 @@ const docTemplate = `{
                         "default": 0,
                         "description": "是否为头图：0 否，1 是",
                         "name": "top_pic",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "页码, 从零开始",
+                        "name": "pageNumber",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页数量",
+                        "name": "pageSize",
                         "in": "query"
                     }
                 ],
@@ -117,6 +268,67 @@ const docTemplate = `{
                                             "items": {
                                                 "$ref": "#/definitions/model.Image"
                                             }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menu/getMenu": {
+            "post": {
+                "description": "获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json等信息。输入名称过滤菜单项，支持模糊匹配。",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "获取净莲阁的菜单",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"\"",
+                        "description": "菜单名称，支持模糊匹配",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "10",
+                        "description": "每页数量",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "0",
+                        "description": "页码, 从零开始",
+                        "name": "pageNumber",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.Menu"
                                         }
                                     }
                                 }
@@ -157,13 +369,15 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "是否为头图：0 否，1 是",
                         "name": "top_pic",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "integer",
                         "description": "图片类型：0 活动，1 餐厅介绍",
                         "name": "type",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -224,10 +438,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "/images/example.jpg"
                 },
-                "create_time": {
+                "createTime": {
                     "description": "Creation time",
-                    "type": "string",
-                    "example": "2023-10-01T12:00:00Z"
+                    "type": "string"
                 },
                 "desc": {
                     "type": "string",
@@ -244,17 +457,62 @@ const docTemplate = `{
                 },
                 "top_pic": {
                     "description": "Whether it is a top image",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "type": {
                     "description": "Image type: 0 activity, 1 restaurant introduction",
                     "type": "integer",
                     "example": 0
                 },
-                "update_time": {
+                "updateTime": {
+                    "description": "Update time",
+                    "type": "string"
+                }
+            }
+        },
+        "model.Menu": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "description": "Creation time",
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "美味的菜品"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "image_url": {
+                    "type": "string",
+                    "example": "/images/menu.jpg"
+                },
+                "ingredients": {
+                    "type": "string",
+                    "example": "{\"米\", \"豆腐\"}"
+                },
+                "name": {
+                    "description": "菜品名称",
+                    "type": "string",
+                    "example": "紫菜汤"
+                },
+                "nutrition": {
+                    "type": "string",
+                    "example": "{\"protein\": \"10g\", \"carbs\": \"20g\", \"fat\": \"5g\"}"
+                },
+                "status": {
+                    "description": "状态：0 删除，1 正常",
+                    "type": "integer",
+                    "example": 1
+                },
+                "updateTime": {
                     "description": "Update time",
                     "type": "string",
-                    "example": "2023-10-01T12:00:00Z"
+                    "example": "2012-1-1"
                 }
             }
         }
@@ -264,7 +522,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8000",
+	Host:             "https://jingliange.com",
 	BasePath:         "/api/v1",
 	Schemes:          []string{"http"},
 	Title:            "Jingliange Server API",

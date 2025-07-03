@@ -1,0 +1,79 @@
+[INFO][log.go:111]2025/07/02 19:37:12 /Users/mye/Git/jingliange_server/internal/repo/about.go:46 Error 1146 (42S02): Table 'jlg.image' doesn't exist
+[19.483ms] [rows:0] SELECT * FROM `image` WHERE status = 1 AND type = 0 AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:37:12 | 500 |  233.490083ms |             ::1 | POST     "/api/v1/getImageList"
+[INFO][log.go:111]2025/07/02 19:39:19 /Users/mye/Git/jingliange_server/internal/repo/about.go:46
+[41.114ms] [rows:0] SELECT * FROM `images` WHERE status = 1 AND type = 0 AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:39:19 | 200 |  177.117708ms |             ::1 | POST     "/api/v1/getImageList"
+[DEBUG][image.go:63]2025/07/02 19:39:31 CheckImageSize size:  1009370
+[INFO][upload.go:77]2025/07/02 19:39:31 UploadImage: Image uploaded successfully 06d80eb0c50b49a509b49f2424e8c805.jpg <nil>
+[INFO][log.go:111]2025/07/02 19:39:31 /Users/mye/Git/jingliange_server/internal/repo/image.go:15
+[92.264ms] [rows:1] INSERT INTO `images` (`address`,`desc`,`status`,`top_pic`,`type`) VALUES ('http://49.234.22.169:8000/uploads/images/06d80eb0c50b49a509b49f2424e8c805.jpg','小狗图片',1,1,1)
+[INFO][upload.go:147]2025/07/02 19:39:31 SaveImageToDB: Image URL saved successfully http://49.234.22.169:8000/uploads/images/06d80eb0c50b49a509b49f2424e8c805.jpg
+[GIN] 2025/07/02 - 19:39:31 | 200 |  236.165167ms |             ::1 | POST     "/uploadImage"
+[INFO][log.go:111]2025/07/02 19:39:36 /Users/mye/Git/jingliange_server/internal/repo/about.go:46
+[42.380ms] [rows:0] SELECT * FROM `images` WHERE status = 1 AND type = 0 AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:39:36 | 200 |  206.432042ms |             ::1 | POST     "/api/v1/getImageList"
+[DEBUG][image.go:63]2025/07/02 19:39:38 CheckImageSize size:  1009370
+[INFO][upload.go:77]2025/07/02 19:39:38 UploadImage: Image uploaded successfully 06d80eb0c50b49a509b49f2424e8c805.jpg <nil>
+[INFO][log.go:111]2025/07/02 19:39:38 /Users/mye/Git/jingliange_server/internal/repo/image.go:15
+[86.495ms] [rows:1] INSERT INTO `images` (`address`,`desc`,`status`,`top_pic`,`type`) VALUES ('http://49.234.22.169:8000/uploads/images/06d80eb0c50b49a509b49f2424e8c805.jpg','小狗图片',1,1,1)
+[INFO][upload.go:147]2025/07/02 19:39:38 SaveImageToDB: Image URL saved successfully http://49.234.22.169:8000/uploads/images/06d80eb0c50b49a509b49f2424e8c805.jpg
+[GIN] 2025/07/02 - 19:39:38 | 200 |     219.626ms |             ::1 | POST     "/uploadImage"
+[DEBUG][image.go:63]2025/07/02 19:39:51 CheckImageSize size:  1009370
+[INFO][upload.go:77]2025/07/02 19:39:51 UploadImage: Image uploaded successfully 06d80eb0c50b49a509b49f2424e8c805.jpg <nil>
+[INFO][log.go:111]2025/07/02 19:39:51 /Users/mye/Git/jingliange_server/internal/repo/image.go:15
+[88.532ms] [rows:1] INSERT INTO `images` (`address`,`desc`,`status`,`top_pic`,`type`) VALUES ('http://49.234.22.169:8000/uploads/images/06d80eb0c50b49a509b49f2424e8c805.jpg','小狗图片',1,1,1)
+[INFO][upload.go:147]2025/07/02 19:39:51 SaveImageToDB: Image URL saved successfully http://49.234.22.169:8000/uploads/images/06d80eb0c50b49a509b49f2424e8c805.jpg
+[GIN] 2025/07/02 - 19:39:51 | 200 |  244.968917ms |             ::1 | POST     "/uploadImage"
+[INFO][log.go:111]2025/07/02 19:39:59 /Users/mye/Git/jingliange_server/internal/repo/about.go:46
+[44.414ms] [rows:0] SELECT * FROM `images` WHERE status = 1 AND type = 0 AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:39:59 | 200 |  183.171708ms |             ::1 | POST     "/api/v1/getImageList"
+[INFO][log.go:111]2025/07/02 19:41:45 /Users/mye/Git/jingliange_server/internal/repo/about.go:46
+[53.556ms] [rows:0] SELECT * FROM `images` WHERE status = 1 AND type = 0 AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:41:45 | 200 |  186.676125ms |             ::1 | POST     "/api/v1/getImageList"
+[DEBUG][image.go:63]2025/07/02 19:42:05 CheckImageSize size:  1009370
+[INFO][upload.go:77]2025/07/02 19:42:22 UploadImage: Image uploaded successfully 06d80eb0c50b49a509b49f2424e8c805.jpg <nil>
+[INFO][log.go:111]2025/07/02 19:42:24 /Users/mye/Git/jingliange_server/internal/repo/image.go:15
+[100.563ms] [rows:1] INSERT INTO `images` (`address`,`desc`,`status`,`top_pic`,`type`) VALUES ('http://49.234.22.169:8000/uploads/images/06d80eb0c50b49a509b49f2424e8c805.jpg','小狗图片',1,1,1)
+[INFO][upload.go:147]2025/07/02 19:42:24 SaveImageToDB: Image URL saved successfully http://49.234.22.169:8000/uploads/images/06d80eb0c50b49a509b49f2424e8c805.jpg
+[GIN] 2025/07/02 - 19:42:24 | 200 | 31.741549667s |             ::1 | POST     "/uploadImage"
+[DEBUG][image.go:63]2025/07/02 19:43:05 CheckImageSize size:  1009370
+[INFO][upload.go:77]2025/07/02 19:44:03 UploadImage: Image uploaded successfully 06d80eb0c50b49a509b49f2424e8c805.jpg <nil>
+[INFO][log.go:111]2025/07/02 19:44:05 /Users/mye/Git/jingliange_server/internal/repo/image.go:15
+[130.984ms] [rows:1] INSERT INTO `images` (`address`,`desc`,`status`,`top_pic`,`type`) VALUES ('http://49.234.22.169:8000/uploads/images/06d80eb0c50b49a509b49f2424e8c805.jpg','小狗图片',1,1,1)
+[INFO][upload.go:147]2025/07/02 19:44:05 SaveImageToDB: Image URL saved successfully http://49.234.22.169:8000/uploads/images/06d80eb0c50b49a509b49f2424e8c805.jpg
+[GIN] 2025/07/02 - 19:44:05 | 200 |         1m21s |             ::1 | POST     "/uploadImage"
+[INFO][log.go:111]2025/07/02 19:48:50 /Users/mye/Git/jingliange_server/internal/repo/about.go:46
+[40.945ms] [rows:0] SELECT * FROM `images` WHERE status = 1 AND type = 0 AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:48:50 | 200 |  172.649916ms |             ::1 | POST     "/api/v1/getImageList"
+[INFO][log.go:111]2025/07/02 19:49:17 /Users/mye/Git/jingliange_server/internal/repo/image.go:27
+[43.978ms] [rows:0] SELECT * FROM `images` WHERE status = 1 AND type = 0 AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:49:31 | 200 |  33.21850025s |             ::1 | POST     "/api/v1/getImageList"
+[INFO][log.go:111]2025/07/02 19:51:36 /Users/mye/Git/jingliange_server/internal/repo/image.go:27
+[44.212ms] [rows:0] SELECT * FROM `images` WHERE status = 1 AND type = 1 AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:51:36 | 200 |  4.400908125s |             ::1 | POST     "/api/v1/getImageList?type=1"
+[INFO][log.go:111]2025/07/02 19:52:26 /Users/mye/Git/jingliange_server/internal/repo/image.go:27
+[47.062ms] [rows:0] SELECT * FROM `images` WHERE status = 1 AND type = 1 AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:52:56 | 200 |         1m15s |             ::1 | POST     "/api/v1/getImageList?type=1"
+[INFO][log.go:111]2025/07/02 19:53:20 /Users/mye/Git/jingliange_server/internal/repo/image.go:27
+[39.650ms] [rows:0] SELECT * FROM `images` WHERE status = 1 AND type = 1 AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:54:37 | 200 |         1m38s |             ::1 | POST     "/api/v1/getImageList?type=1"
+[INFO][log.go:111]2025/07/02 19:55:15 /Users/mye/Git/jingliange_server/internal/repo/image.go:30
+[46.554ms] [rows:0] SELECT * FROM `images` WHERE (status = 1 AND type = 1) AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:56:06 | 200 | 59.587128791s |             ::1 | POST     "/api/v1/getImageList?type=1"
+[INFO][log.go:111]2025/07/02 19:59:23 /Users/mye/Git/jingliange_server/internal/repo/image.go:31
+[43.020ms] [rows:1] SELECT * FROM `images` WHERE (status = 1 AND type = 1) AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 19:59:23 | 200 |  9.232800125s |             ::1 | POST     "/api/v1/getImageList?type=1"
+[INFO][log.go:111]2025/07/02 20:00:35 /Users/mye/Git/jingliange_server/internal/repo/image.go:31
+[49.593ms] [rows:1] SELECT * FROM `images` WHERE (status = 1 AND type = 1) AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 20:00:35 | 200 |  7.908337917s |             ::1 | POST     "/api/v1/getImageList?type=1"
+[INFO][log.go:111]2025/07/02 20:00:48 /Users/mye/Git/jingliange_server/internal/repo/image.go:31
+[38.674ms] [rows:1] SELECT * FROM `images` WHERE (status = 1 AND type = 1) AND top_pic = 0 ORDER BY create_time DESC
+[GIN] 2025/07/02 - 20:00:48 | 200 |  6.524478959s |             ::1 | POST     "/api/v1/getImageList?type=1"
+[INFO][log.go:111]2025/07/02 20:37:40 /Users/mye/Git/jingliange_server/internal/repo/image.go:44
+[45.115ms] [rows:1] SELECT * FROM `images` WHERE status = 1 AND top_pic = 1 ORDER BY create_time DESC,`images`.`id` LIMIT 1
+[GIN] 2025/07/02 - 20:37:40 | 200 |  199.908417ms |             ::1 | GET      "/api/v1/getTopImage"
+[GIN] 2025/07/02 - 20:42:30 | 200 |     658.834µs |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/02 - 20:42:30 | 200 |     217.709µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/02 - 20:42:31 | 200 |      188.25µs |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/02 - 20:42:31 | 200 |      98.333µs |             ::1 | GET      "/swagger/doc.json"

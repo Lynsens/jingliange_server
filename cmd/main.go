@@ -25,7 +25,7 @@ func init() {
 // @description This is the backend API for Jingliange.
 // @termsOfService TO IMPLEMENT
 
-// @host localhost:8000
+// @host https://jingliange.com
 // @BasePath /api/v1
 // @schemes http
 func main() {

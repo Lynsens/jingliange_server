@@ -37,27 +37,3 @@ func (a *aboutDB) GetActivityList(timestamp int, pageNumber int) ([]model.Activi
 	}
 	return m, nil
 }
-
-func (a *aboutDB) GetImageList(imageType int, topPic int) ([]model.Image, error) {
-	m := []model.Image{}
-	err := a.db.Table("image").
-		Where("status = ? AND type = ? AND top_pic = ?", 1, imageType, topPic).
-		Order("create_time DESC").
-		Find(&m).Error
-	if err != nil {
-		return m, err
-	}
-	return m, nil
-}
-
-func (a *aboutDB) GetTopImage() (model.Image, error) {
-	m := model.Image{}
-	err := a.db.Table("image").
-		Where("status = ? AND top_pic = ?", 1, 1).
-		Order("create_time DESC").
-		First(&m).Error
-	if err != nil {
-		return m, err
-	}
-	return m, nil
-}
