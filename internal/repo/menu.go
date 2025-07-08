@@ -13,7 +13,7 @@ func NewMenuDB(db *gorm.DB) *MenuDB {
 	return &MenuDB{db: db}
 }
 
-func (m *MenuDB) GetMenuList(pageSize, pageNumber int, name string) ([]model.Menu, error) {
+func (m *MenuDB) GetMenuList(pageSize, pageNumber int, name string) ([]model.MenuWithLikes, error) {
 	var menus []model.Menu
 	offset := pageNumber * pageSize
 
@@ -28,7 +28,23 @@ func (m *MenuDB) GetMenuList(pageSize, pageNumber int, name string) ([]model.Men
 	if err != nil {
 		return nil, err
 	}
-	return menus, nil
+
+	// 为每个菜品获取点赞数
+	var menusWithLikes []model.MenuWithLikes
+	for _, menu := range menus {
+		likeCount, err := m.GetMenuLikeCount(menu.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		menuWithLikes := model.MenuWithLikes{
+			Menu:      menu,
+			LikeCount: likeCount,
+		}
+		menusWithLikes = append(menusWithLikes, menuWithLikes)
+	}
+
+	return menusWithLikes, nil
 }
 
 func (m *MenuDB) GetMenuCount(name string) (int64, error) {
@@ -93,4 +109,123 @@ func (m *MenuDB) DeleteMenu(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (m *MenuDB) LikeMenu(menuID int, userID string) error {
+	// 检查用户是否已经对该菜品有反馈
+	var existingFeedback model.MenuFeedback
+	err := m.db.Table("menu_feedback").Where("menu_id = ? AND user_id = ? AND status = ?", menuID, userID, 1).First(&existingFeedback).Error
+
+	if err == nil {
+		// 如果已存在反馈，更新为喜欢
+		err = m.db.Table("menu_feedback").Where("id = ?", existingFeedback.ID).Update("preference", 1).Error
+		return err
+	} else if err == gorm.ErrRecordNotFound {
+		// 如果不存在反馈，创建新的喜欢记录
+		feedback := model.MenuFeedback{
+			MenuID:     int(menuID),
+			UserID:     userID,
+			Preference: 1, // 1 表示喜欢
+			Status:     1, // 1 表示正常状态
+		}
+		err = m.db.Table("menu_feedback").Create(&feedback).Error
+		return err
+	} else {
+		// 其他数据库错误
+		return err
+	}
+}
+
+func (m *MenuDB) UnlikeMenu(menuID int, userID string) error {
+	// 将用户对该菜品的反馈设置为默认状态（取消点赞）
+	err := m.db.Table("menu_feedback").Where("menu_id = ? AND user_id = ? AND status = ?", menuID, userID, 1).Update("preference", 0).Error
+	return err
+}
+
+func (m *MenuDB) GetMenuLikeStatus(menuID int, userID string) (int, error) {
+	var feedback model.MenuFeedback
+	err := m.db.Table("menu_feedback").Where("menu_id = ? AND user_id = ? AND status = ?", menuID, userID, 1).First(&feedback).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return 0, nil // 0 表示默认状态（未点赞）
+	} else if err != nil {
+		return 0, err
+	}
+
+	return int(feedback.Preference), nil
+}
+
+func (m *MenuDB) GetMenuLikeCount(menuID int) (int64, error) {
+	var count int64
+	err := m.db.Table("menu_feedback").Where("menu_id = ? AND preference = ? AND status = ?", menuID, 1, 1).Count(&count).Error
+	return count, err
+}
+
+func (m *MenuDB) CommentMenu(menuID int, userID string, comment string) error {
+	// 检查用户是否已经对该菜品有反馈
+	var existingFeedback model.MenuFeedback
+	err := m.db.Table("menu_feedback").Where("menu_id = ? AND user_id = ? AND status = ?", menuID, userID, 1).First(&existingFeedback).Error
+
+	if err == nil {
+		// 如果已存在反馈，更新评论
+		err = m.db.Table("menu_feedback").Where("id = ?", existingFeedback.ID).Update("comment", comment).Error
+		return err
+	} else if err == gorm.ErrRecordNotFound {
+		// 如果不存在反馈，创建新的评论记录
+		feedback := model.MenuFeedback{
+			MenuID:     int(menuID),
+			UserID:     userID,
+			Preference: 0, // 0 表示默认状态
+			Comment:    comment,
+			Status:     1, // 1 表示正常状态
+		}
+		err = m.db.Table("menu_feedback").Create(&feedback).Error
+		return err
+	} else {
+		// 其他数据库错误
+		return err
+	}
+}
+
+func (m *MenuDB) GetMenuComments(menuID int, pageSize, pageNumber int) ([]model.MenuFeedback, error) {
+	var comments []model.MenuFeedback
+	offset := pageNumber * pageSize
+
+	err := m.db.Table("menu_feedback").
+		Where("menu_id = ? AND status = ? AND comment != ?", menuID, 1, "").
+		Order("create_time DESC").
+		Offset(offset).
+		Limit(pageSize).
+		Find(&comments).Error
+
+	return comments, err
+}
+
+func (m *MenuDB) GetMenuCommentCount(menuID int) (int64, error) {
+	var count int64
+	err := m.db.Table("menu_feedback").
+		Where("menu_id = ? AND status = ? AND comment != ?", menuID, 1, "").
+		Count(&count).Error
+	return count, err
+}
+
+func (m *MenuDB) GetMenuByIDWithLikes(id int) (model.MenuWithLikes, error) {
+	var menu model.Menu
+	err := m.db.Table("menu").Where("id = ? AND status = ?", id, 1).First(&menu).Error
+	if err != nil {
+		return model.MenuWithLikes{}, err
+	}
+
+	// 获取点赞数
+	likeCount, err := m.GetMenuLikeCount(id)
+	if err != nil {
+		return model.MenuWithLikes{}, err
+	}
+
+	menuWithLikes := model.MenuWithLikes{
+		Menu:      menu,
+		LikeCount: likeCount,
+	}
+
+	return menuWithLikes, nil
 }

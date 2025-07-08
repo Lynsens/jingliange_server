@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/lynsens/jingliange_server/internal/model"
 	"github.com/lynsens/jingliange_server/internal/repo"
 	"github.com/lynsens/jingliange_server/pkg/app"
 	"github.com/lynsens/jingliange_server/pkg/e"

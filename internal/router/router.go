@@ -49,6 +49,16 @@ func InitRouter() *gin.Engine {
 		apiv1.POST("/about/getImageList", v1.GetImangeList)
 		//获取菜单
 		apiv1.POST("/menu/getMenu", v1.GetMenu)
+		//获取单个菜品信息
+		apiv1.POST("/menu/getMenuByID", v1.GetMenuByID)
+		//菜品点赞
+		apiv1.POST("/menu/like", v1.LikeMenu)
+		//获取菜品点赞状态
+		apiv1.POST("/menu/getLikeStatus", v1.GetMenuLikeStatus)
+		//菜品评论
+		apiv1.POST("/menu/comment", v1.CommentMenu)
+		//获取菜品评论列表
+		apiv1.POST("/menu/getComments", v1.GetMenuComments)
 		// //更新指定文章
 		// apiv1.PUT("/articles/:id", v1.EditArticle)
 		// //删除指定文章
@@ -60,6 +70,8 @@ func InitRouter() *gin.Engine {
 	{
 		// 上传菜品
 		apiAdmin.POST("/uploadMenuItem", admin.UploadMenuItem)
+		// 删除菜品
+		apiAdmin.DELETE("/deleteMenuItem", admin.DeleteMenuItem)
 	}
 
 	return r

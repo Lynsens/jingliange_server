@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.DeleteMenuRequest"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.DeleteMenuRequest"
                         }
                     }
                 ],
@@ -44,25 +44,25 @@ const docTemplate = `{
                     "200": {
                         "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     },
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid menu ID\"}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     },
                     "404": {
                         "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     }
                 }
@@ -88,7 +88,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Menu"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.Menu"
                         }
                     }
                 ],
@@ -96,19 +96,19 @@ const docTemplate = `{
                     "200": {
                         "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"id\":1,\"name\":\"豆腐汤\",\"image_url\":\"/images/tofusoup.jpg\",\"desc\":\"清淡营养的素食汤品，豆腐嫩滑，口感清香，富含植物蛋白\",\"nutrition\":\"...\",\"ingredients\":\"...\",\"status\":1}}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     },
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"All fields are required\"}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     }
                 }
@@ -134,7 +134,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.ActivityQueryRequest"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.ActivityQueryRequest"
                         }
                     }
                 ],
@@ -144,7 +144,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -152,7 +152,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.Activity"
+                                                "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.Activity"
                                             }
                                         }
                                     }
@@ -163,13 +163,13 @@ const docTemplate = `{
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     }
                 }
@@ -188,13 +188,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     }
                 }
@@ -216,13 +216,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/model.Image"
+                                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.Image"
                                         }
                                     }
                                 }
@@ -232,7 +232,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     }
                 }
@@ -281,7 +281,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -289,7 +289,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.Image"
+                                                "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.Image"
                                             }
                                         }
                                     }
@@ -300,7 +300,178 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menu/comment": {
+            "post": {
+                "description": "用户对菜品进行评论",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "菜品评论",
+                "parameters": [
+                    {
+                        "description": "评论参数",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuCommentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":\"comment added successfully\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menu/getComments": {
+            "post": {
+                "description": "获取指定菜品的评论列表，支持分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "获取菜品评论列表",
+                "parameters": [
+                    {
+                        "description": "查询参数",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuCommentsQueryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"menu_id\":1,\"user_id\":\"user123\",\"preference\":1,\"comment\":\"非常好吃！\",\"status\":1}]}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuFeedback"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menu/getLikeStatus": {
+            "post": {
+                "description": "获取用户对特定菜品的点赞状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "获取菜品点赞状态",
+                "parameters": [
+                    {
+                        "description": "查询参数",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuLikeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"liked\":true,\"preference\":1}}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     }
                 }
@@ -308,7 +479,7 @@ const docTemplate = `{
         },
         "/api/v1/menu/getMenu": {
             "post": {
-                "description": "获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json等信息。输入名称过滤菜单项，支持模糊匹配。",
+                "description": "获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json、点赞数等信息。输入名称过滤菜单项，支持模糊匹配。",
                 "consumes": [
                     "application/json"
                 ],
@@ -326,17 +497,17 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.MenuQueryRequest"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuQueryRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"name\":\"紫菜汤\",\"image_url\":\"/images/menu.jpg\",\"desc\":\"美味的菜品\",\"nutrition\":\"...\",\"ingredients\":\"...\",\"status\":1}]}",
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"name\":\"紫菜汤\",\"image_url\":\"/images/menu.jpg\",\"desc\":\"美味的菜品\",\"nutrition\":\"...\",\"ingredients\":\"...\",\"status\":1,\"like_count\":5}]}",
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -344,7 +515,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.Menu"
+                                                "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuWithLikes"
                                             }
                                         }
                                     }
@@ -355,13 +526,129 @@ const docTemplate = `{
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menu/getMenuByID": {
+            "post": {
+                "description": "根据菜品ID获取单个菜品的详细信息，包括点赞数",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "获取单个菜品信息",
+                "parameters": [
+                    {
+                        "description": "查询参数",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuByIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"id\":1,\"name\":\"紫菜汤\",\"image_url\":\"/images/menu.jpg\",\"desc\":\"美味的菜品\",\"nutrition\":\"...\",\"ingredients\":\"...\",\"status\":1,\"like_count\":5,\"create_time\":\"2012-1-1\",\"update_time\":\"2012-1-1\"}}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuWithLikes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/menu/like": {
+            "post": {
+                "description": "用户为喜欢的菜品点赞或取消点赞",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "菜品点赞",
+                "parameters": [
+                    {
+                        "description": "点赞参数",
+                        "name": "like",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuLikeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":\"liked successfully\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     }
                 }
@@ -409,7 +696,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/app.Response"
+                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -428,13 +715,13 @@ const docTemplate = `{
                     "400": {
                         "description": "参数错误",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     },
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/app.Response"
+                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
                         }
                     }
                 }
@@ -442,25 +729,13 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "app.Response": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "data": {},
-                "msg": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Activity": {
+        "github_com_lynsens_jingliange_server_internal_model.Activity": {
             "type": "object",
             "properties": {
                 "content": {
                     "type": "string"
                 },
-                "createTime": {
+                "create_time": {
                     "description": "Creation time",
                     "type": "string"
                 },
@@ -477,16 +752,16 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
-                "updateTime": {
+                "update_time": {
                     "description": "Update time",
                     "type": "string"
                 }
             }
         },
-        "model.ActivityQueryRequest": {
+        "github_com_lynsens_jingliange_server_internal_model.ActivityQueryRequest": {
             "type": "object",
             "properties": {
-                "pageNumber": {
+                "page_number": {
                     "description": "页码，从零开始",
                     "type": "integer",
                     "example": 0
@@ -498,7 +773,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.DeleteMenuRequest": {
+        "github_com_lynsens_jingliange_server_internal_model.DeleteMenuRequest": {
             "type": "object",
             "properties": {
                 "id": {
@@ -508,14 +783,14 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Image": {
+        "github_com_lynsens_jingliange_server_internal_model.Image": {
             "type": "object",
             "properties": {
                 "address": {
                     "type": "string",
                     "example": "/images/example.jpg"
                 },
-                "createTime": {
+                "create_time": {
                     "description": "Creation time",
                     "type": "string"
                 },
@@ -542,16 +817,16 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 0
                 },
-                "updateTime": {
+                "update_time": {
                     "description": "Update time",
                     "type": "string"
                 }
             }
         },
-        "model.Menu": {
+        "github_com_lynsens_jingliange_server_internal_model.Menu": {
             "type": "object",
             "properties": {
-                "createTime": {
+                "create_time": {
                     "description": "Creation time",
                     "type": "string",
                     "example": "2012-1-1"
@@ -586,14 +861,122 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
-                "updateTime": {
+                "update_time": {
                     "description": "Update time",
                     "type": "string",
                     "example": "2012-1-1"
                 }
             }
         },
-        "model.MenuQueryRequest": {
+        "github_com_lynsens_jingliange_server_internal_model.MenuByIDRequest": {
+            "type": "object",
+            "properties": {
+                "menu_id": {
+                    "description": "菜品ID",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "github_com_lynsens_jingliange_server_internal_model.MenuCommentRequest": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "description": "评论内容",
+                    "type": "string",
+                    "example": "非常好吃的菜品！"
+                },
+                "menu_id": {
+                    "description": "菜品ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "user_id": {
+                    "description": "用户ID",
+                    "type": "string",
+                    "example": "user123"
+                }
+            }
+        },
+        "github_com_lynsens_jingliange_server_internal_model.MenuCommentsQueryRequest": {
+            "type": "object",
+            "properties": {
+                "menu_id": {
+                    "description": "菜品ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "page_number": {
+                    "description": "页码，从零开始",
+                    "type": "integer",
+                    "example": 0
+                },
+                "page_size": {
+                    "description": "每页数量",
+                    "type": "integer",
+                    "example": 10
+                }
+            }
+        },
+        "github_com_lynsens_jingliange_server_internal_model.MenuFeedback": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string",
+                    "example": "非常好吃"
+                },
+                "create_time": {
+                    "description": "Creation time",
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "menu_id": {
+                    "description": "菜单 ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "preference": {
+                    "description": "状态：0 默认，1 喜欢，2 不喜欢",
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "description": "状态：0 删除，1 正常",
+                    "type": "integer",
+                    "example": 1
+                },
+                "update_time": {
+                    "description": "Update time",
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
+                "user_id": {
+                    "description": "用户\t ID",
+                    "type": "string",
+                    "example": "user123"
+                }
+            }
+        },
+        "github_com_lynsens_jingliange_server_internal_model.MenuLikeRequest": {
+            "type": "object",
+            "properties": {
+                "menu_id": {
+                    "description": "菜品ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "user_id": {
+                    "description": "用户ID",
+                    "type": "string",
+                    "example": "user123"
+                }
+            }
+        },
+        "github_com_lynsens_jingliange_server_internal_model.MenuQueryRequest": {
             "type": "object",
             "properties": {
                 "name": {
@@ -601,15 +984,77 @@ const docTemplate = `{
                     "type": "string",
                     "example": "紫菜汤"
                 },
-                "pageNumber": {
+                "page_number": {
                     "description": "页码，从零开始",
                     "type": "integer",
                     "example": 0
                 },
-                "pageSize": {
+                "page_size": {
                     "description": "每页数量",
                     "type": "integer",
                     "example": 10
+                }
+            }
+        },
+        "github_com_lynsens_jingliange_server_internal_model.MenuWithLikes": {
+            "type": "object",
+            "properties": {
+                "create_time": {
+                    "description": "Creation time",
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "美味的菜品"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "image_url": {
+                    "type": "string",
+                    "example": "/images/menu.jpg"
+                },
+                "ingredients": {
+                    "type": "string",
+                    "example": "{\"米\", \"豆腐\"}"
+                },
+                "like_count": {
+                    "description": "点赞数",
+                    "type": "integer",
+                    "example": 5
+                },
+                "name": {
+                    "description": "菜品名称",
+                    "type": "string",
+                    "example": "紫菜汤"
+                },
+                "nutrition": {
+                    "type": "string",
+                    "example": "{\"protein\": \"10g\", \"carbs\": \"20g\", \"fat\": \"5g\"}"
+                },
+                "status": {
+                    "description": "状态：0 删除，1 正常",
+                    "type": "integer",
+                    "example": 1
+                },
+                "update_time": {
+                    "description": "Update time",
+                    "type": "string",
+                    "example": "2012-1-1"
+                }
+            }
+        },
+        "github_com_lynsens_jingliange_server_pkg_app.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "msg": {
+                    "type": "string"
                 }
             }
         }

@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,15 +11,16 @@ import (
 	"github.com/lynsens/jingliange_server/pkg/app"
 	"github.com/lynsens/jingliange_server/pkg/e"
 	"github.com/lynsens/jingliange_server/pkg/setting"
+	"gorm.io/gorm"
 )
 
 // @Summary 获取净莲阁的菜单
-// @Description 获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json等信息。输入名称过滤菜单项，支持模糊匹配。
+// @Description 获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json、点赞数等信息。输入名称过滤菜单项，支持模糊匹配。
 // @Tags  Menu
 // @Accept json
-// @Param query body model.MenuQueryRequest true "查询参数" schemaexample({"name":"紫菜汤","pageSize":10,"pageNumber":0})
+// @Param query body model.MenuQueryRequest true "查询参数" schemaexample({"name":"紫菜汤","page_size":10,"page_number":0})
 // @Produce  json
-// @Success 200 {object} app.Response{data=[]model.Menu} "{"code":200,"msg":"ok","data":[{"id":1,"name":"紫菜汤","image_url":"/images/menu.jpg","desc":"美味的菜品","nutrition":"...","ingredients":"...","status":1}]}"
+// @Success 200 {object} app.Response{data=[]model.MenuWithLikes} "{"code":200,"msg":"ok","data":[{"id":1,"name":"紫菜汤","image_url":"/images/menu.jpg","desc":"美味的菜品","nutrition":"...","ingredients":"...","status":1,"like_count":5}]}"
 // @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
 // @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
 // @Router /api/v1/menu/getMenu [post]
@@ -54,4 +57,336 @@ func GetMenu(c *gin.Context) {
 	}
 
 	appG.Response(http.StatusOK, e.SUCCESS, activityList)
+}
+
+// @Summary 菜品点赞
+// @Description 用户为喜欢的菜品点赞或取消点赞
+// @Tags Menu
+// @Accept json
+// @Param like body model.MenuLikeRequest true "点赞参数" schemaexample({"menu_id":1,"user_id":"user123"})
+// @Produce  json
+// @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":"liked successfully"}"
+// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
+// @Failure 404 {object} app.Response "{"code":404,"msg":"not found","data":"Menu item not found"}"
+// @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
+// @Router /api/v1/menu/like [post]
+func LikeMenu(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	menuRepo := repo.NewMenuDB(db)
+
+	// 使用 body 参数
+	var likeReq model.MenuLikeRequest
+	if err := c.ShouldBindJSON(&likeReq); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
+		return
+	}
+
+	// 验证参数
+	if likeReq.MenuID <= 0 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
+		return
+	}
+	if likeReq.UserID == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User ID is required")
+		return
+	}
+
+	// 检查菜品是否存在且状态正常
+	existingMenu, err := menuRepo.GetMenuByID(likeReq.MenuID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
+		} else {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		}
+		return
+	}
+
+	// 检查菜品状态
+	if existingMenu.Status == 0 {
+		appG.Response(http.StatusNotFound, e.ERROR, "Menu item not available")
+		return
+	}
+
+	// 检查当前点赞状态
+	currentStatus, err := menuRepo.GetMenuLikeStatus(likeReq.MenuID, likeReq.UserID)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		return
+	}
+
+	// 如果当前是喜欢状态，则取消点赞；否则点赞
+	if currentStatus == 1 {
+		// 取消点赞
+		if err := menuRepo.UnlikeMenu(likeReq.MenuID, likeReq.UserID); err != nil {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+			return
+		}
+		appG.Response(http.StatusOK, e.SUCCESS, "unliked successfully")
+	} else {
+		// 点赞
+		if err := menuRepo.LikeMenu(likeReq.MenuID, likeReq.UserID); err != nil {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+			return
+		}
+		appG.Response(http.StatusOK, e.SUCCESS, "liked successfully")
+	}
+}
+
+// @Summary 获取菜品点赞状态
+// @Description 获取用户对特定菜品的点赞状态
+// @Tags Menu
+// @Accept json
+// @Param status body model.MenuLikeRequest true "查询参数" schemaexample({"menu_id":1,"user_id":"user123"})
+// @Produce  json
+// @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":{"liked":true,"preference":1}}"
+// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
+// @Failure 404 {object} app.Response "{"code":404,"msg":"not found","data":"Menu item not found"}"
+// @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
+// @Router /api/v1/menu/getLikeStatus [post]
+func GetMenuLikeStatus(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	menuRepo := repo.NewMenuDB(db)
+
+	// 使用 body 参数
+	var statusReq model.MenuLikeRequest
+	if err := c.ShouldBindJSON(&statusReq); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
+		return
+	}
+
+	// 验证参数
+	if statusReq.MenuID <= 0 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
+		return
+	}
+	if statusReq.UserID == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User ID is required")
+		return
+	}
+
+	// 检查菜品是否存在
+	_, err = menuRepo.GetMenuByID(statusReq.MenuID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
+		} else {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		}
+		return
+	}
+
+	// 获取点赞状态
+	preference, err := menuRepo.GetMenuLikeStatus(statusReq.MenuID, statusReq.UserID)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		return
+	}
+
+	// 构建响应数据
+	response := map[string]interface{}{
+		"liked":      preference == 1,
+		"preference": preference,
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, response)
+}
+
+// @Summary 菜品评论
+// @Description 用户对菜品进行评论
+// @Tags Menu
+// @Accept json
+// @Param comment body model.MenuCommentRequest true "评论参数" schemaexample({"menu_id":1,"user_id":"user123","comment":"非常好吃的菜品！"})
+// @Produce  json
+// @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":"comment added successfully"}"
+// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
+// @Failure 404 {object} app.Response "{"code":404,"msg":"not found","data":"Menu item not found"}"
+// @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
+// @Router /api/v1/menu/comment [post]
+func CommentMenu(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	menuRepo := repo.NewMenuDB(db)
+
+	// 使用 body 参数
+	var commentReq model.MenuCommentRequest
+	if err := c.ShouldBindJSON(&commentReq); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
+		return
+	}
+
+	// 验证参数
+	if commentReq.MenuID <= 0 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
+		return
+	}
+	if commentReq.UserID == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User ID is required")
+		return
+	}
+	if commentReq.Comment == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Comment content is required")
+		return
+	}
+
+	// 检查菜品是否存在且状态正常
+	existingMenu, err := menuRepo.GetMenuByID(commentReq.MenuID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
+		} else {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		}
+		return
+	}
+
+	// 检查菜品状态
+	if existingMenu.Status == 0 {
+		appG.Response(http.StatusNotFound, e.ERROR, "Menu item not available")
+		return
+	}
+
+	// 添加评论
+	if err := menuRepo.CommentMenu(commentReq.MenuID, commentReq.UserID, commentReq.Comment); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, "comment added successfully")
+}
+
+// @Summary 获取菜品评论列表
+// @Description 获取指定菜品的评论列表，支持分页
+// @Tags Menu
+// @Accept json
+// @Param query body model.MenuCommentsQueryRequest true "查询参数" schemaexample({"menu_id":1,"page_size":10,"page_number":0})
+// @Produce  json
+// @Success 200 {object} app.Response{data=[]model.MenuFeedback} "{"code":200,"msg":"ok","data":[{"id":1,"menu_id":1,"user_id":"user123","preference":1,"comment":"非常好吃！","status":1}]}"
+// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
+// @Failure 404 {object} app.Response "{"code":404,"msg":"not found","data":"Menu item not found"}"
+// @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
+// @Router /api/v1/menu/getComments [post]
+func GetMenuComments(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	menuRepo := repo.NewMenuDB(db)
+
+	// 使用 body 参数
+	var queryReq model.MenuCommentsQueryRequest
+	if err := c.ShouldBindJSON(&queryReq); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, fmt.Sprintf("Invalid input data: %v", err))
+		return
+	}
+
+	// Debug: 打印接收到的参数
+	fmt.Printf("Received MenuCommentsQueryRequest: %+v\n", queryReq)
+
+	// 验证参数
+	if queryReq.MenuID <= 0 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
+		return
+	}
+
+	// 设置默认值
+	if queryReq.PageSize <= 0 {
+		queryReq.PageSize = setting.AppSetting.PageSize
+	}
+	if queryReq.PageNumber < 0 {
+		queryReq.PageNumber = 0
+	}
+
+	// 检查菜品是否存在
+	_, err = menuRepo.GetMenuByID(queryReq.MenuID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
+		} else {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		}
+		return
+	}
+
+	// 获取评论列表
+	comments, err := menuRepo.GetMenuComments(queryReq.MenuID, queryReq.PageSize, queryReq.PageNumber)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, comments)
+}
+
+// @Summary 获取单个菜品信息
+// @Description 根据菜品ID获取单个菜品的详细信息，包括点赞数
+// @Tags Menu
+// @Accept json
+// @Param query body model.MenuByIDRequest true "查询参数" schemaexample({"menu_id":1})
+// @Produce  json
+// @Success 200 {object} app.Response{data=model.MenuWithLikes} "{"code":200,"msg":"ok","data":{"id":1,"name":"紫菜汤","image_url":"/images/menu.jpg","desc":"美味的菜品","nutrition":"...","ingredients":"...","status":1,"like_count":5,"create_time":"2012-1-1","update_time":"2012-1-1"}}"
+// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
+// @Failure 404 {object} app.Response "{"code":404,"msg":"not found","data":"Menu item not found"}"
+// @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
+// @Router /api/v1/menu/getMenuByID [post]
+func GetMenuByID(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	menuRepo := repo.NewMenuDB(db)
+
+	// 使用 body 参数
+	var queryReq model.MenuByIDRequest
+	if err := c.ShouldBindJSON(&queryReq); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, fmt.Sprintf("Invalid input data: %v", err))
+		return
+	}
+
+	// 验证参数
+	if queryReq.MenuID <= 0 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
+		return
+	}
+
+	// 获取菜品信息
+	menuWithLikes, err := menuRepo.GetMenuByIDWithLikes(queryReq.MenuID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
+		} else {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		}
+		return
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, menuWithLikes)
 }

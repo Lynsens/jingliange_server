@@ -65,7 +65,7 @@ func GetTopImage(c *gin.Context) {
 // @Description 获取净莲阁的活动列表，支持时间戳过滤和分页
 // @Tags About
 // @Accept json
-// @Param query body model.ActivityQueryRequest true "查询参数" schemaexample({"timestamp":0,"pageNumber":0})
+// @Param query body model.ActivityQueryRequest true "查询参数" schemaexample({"timestamp":0,"page_number":0})
 // @Produce  json
 // @Success 200 {object} app.Response{data=[]model.Activity} "{"code":200,"msg":"ok","data":[{"id":1,"title":"素食文化活动","content":"介绍素食文化","img":"/images/activity1.jpg","status":1}]}"
 // @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"

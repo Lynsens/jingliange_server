@@ -1,0 +1,90 @@
+[GIN] 2025/07/08 - 14:05:36 | 200 |     886.125µs |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/08 - 14:05:36 | 200 |       90.25µs |             ::1 | GET      "/swagger/swagger-ui.css"
+[GIN] 2025/07/08 - 14:05:36 | 200 |     490.166µs |             ::1 | GET      "/swagger/swagger-ui-standalone-preset.js"
+[GIN] 2025/07/08 - 14:05:36 | 200 |      3.7415ms |             ::1 | GET      "/swagger/swagger-ui-bundle.js"
+[GIN] 2025/07/08 - 14:05:36 | 200 |     296.791µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/08 - 14:05:36 | 200 |     4.37175ms |             ::1 | GET      "/swagger/favicon-32x32.png"
+[GIN] 2025/07/08 - 14:06:50 | 200 |     636.917µs |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/08 - 14:06:50 | 200 |     259.375µs |             ::1 | GET      "/swagger/swagger-ui.css"
+[GIN] 2025/07/08 - 14:06:50 | 200 |     257.666µs |             ::1 | GET      "/swagger/swagger-ui-standalone-preset.js"
+[GIN] 2025/07/08 - 14:06:50 | 200 |    3.066834ms |             ::1 | GET      "/swagger/swagger-ui-bundle.js"
+[GIN] 2025/07/08 - 14:06:50 | 200 |     310.125µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/08 - 14:06:50 | 200 |    3.686834ms |             ::1 | GET      "/swagger/favicon-32x32.png"
+[INFO][log.go:111]2025/07/08 14:07:25 /Users/mye/Git/jingliange_server/internal/repo/menu.go:27
+[36.051ms] [rows:3] SELECT * FROM `menu` WHERE status = 1 LIMIT 10
+[GIN] 2025/07/08 - 14:07:25 | 200 |  215.099459ms |             ::1 | POST     "/api/v1/menu/getMenu"
+[GIN] 2025/07/08 - 14:08:04 | 404 |         875ns |             ::1 | POST     "/api/v1/menu/like"
+[INFO][log.go:111]2025/07/08 14:09:34 /Users/mye/Git/jingliange_server/internal/repo/menu.go:52
+[39.091ms] [rows:1] SELECT * FROM `menu` WHERE id = 5 ORDER BY `menu`.`id` LIMIT 1
+[INFO][log.go:111]2025/07/08 14:09:34 /Users/mye/Git/jingliange_server/internal/repo/menu.go:131
+[38.392ms] [rows:0] SELECT * FROM `menu_feedback` WHERE menu_id = 5 AND user_id = 'xiaohei' AND status = 1 ORDER BY `menu_feedback`.`id` LIMIT 1
+[INFO][log.go:111]2025/07/08 14:09:34 /Users/mye/Git/jingliange_server/internal/repo/menu.go:101
+[38.086ms] [rows:0] SELECT * FROM `menu_feedback` WHERE menu_id = 5 AND user_id = 'xiaohei' AND status = 1 ORDER BY `menu_feedback`.`id` LIMIT 1
+[INFO][log.go:111]2025/07/08 14:09:34 /Users/mye/Git/jingliange_server/internal/repo/menu.go:115
+[84.369ms] [rows:1] INSERT INTO `menu_feedback` (`menu_id`,`user_id`,`preference`,`comment`,`status`) VALUES (5,'xiaohei',1,'',1)
+[GIN] 2025/07/08 - 14:09:34 | 200 |   321.88225ms |             ::1 | POST     "/api/v1/menu/like"
+[INFO][log.go:111]2025/07/08 14:10:24 /Users/mye/Git/jingliange_server/internal/repo/menu.go:52
+[44.444ms] [rows:1] SELECT * FROM `menu` WHERE id = 1 ORDER BY `menu`.`id` LIMIT 1
+[INFO][log.go:111]2025/07/08 14:10:24 /Users/mye/Git/jingliange_server/internal/repo/menu.go:131
+[42.737ms] [rows:0] SELECT * FROM `menu_feedback` WHERE menu_id = 1 AND user_id = 'user123' AND status = 1 ORDER BY `menu_feedback`.`id` LIMIT 1
+[GIN] 2025/07/08 - 14:10:24 | 200 |  220.911541ms |             ::1 | POST     "/api/v1/menu/getLikeStatus"
+[GIN] 2025/07/08 - 14:10:29 | 400 |    113.7355ms |             ::1 | POST     "/api/v1/menu/getLikeStatus"
+[GIN] 2025/07/08 - 14:14:00 | 200 |     973.041µs |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/08 - 14:14:00 | 200 |     190.208µs |             ::1 | GET      "/swagger/swagger-ui.css"
+[GIN] 2025/07/08 - 14:14:00 | 200 |     285.792µs |             ::1 | GET      "/swagger/swagger-ui-standalone-preset.js"
+[GIN] 2025/07/08 - 14:14:00 | 200 |    2.908583ms |             ::1 | GET      "/swagger/swagger-ui-bundle.js"
+[GIN] 2025/07/08 - 14:14:00 | 200 |     517.833µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/08 - 14:14:00 | 200 |       3.935ms |             ::1 | GET      "/swagger/favicon-32x32.png"
+[INFO][log.go:111]2025/07/08 14:14:15 /Users/mye/Git/jingliange_server/internal/repo/menu.go:27
+[36.801ms] [rows:3] SELECT * FROM `menu` WHERE status = 1 LIMIT 10
+[INFO][log.go:111]2025/07/08 14:14:15 /Users/mye/Git/jingliange_server/internal/repo/menu.go:160
+[49.030ms] [rows:1] SELECT count(*) FROM `menu_feedback` WHERE menu_id = 5 AND preference = 1 AND status = 1
+[INFO][log.go:111]2025/07/08 14:14:15 /Users/mye/Git/jingliange_server/internal/repo/menu.go:160
+[35.517ms] [rows:1] SELECT count(*) FROM `menu_feedback` WHERE menu_id = 6 AND preference = 1 AND status = 1
+[INFO][log.go:111]2025/07/08 14:14:15 /Users/mye/Git/jingliange_server/internal/repo/menu.go:160
+[36.464ms] [rows:1] SELECT count(*) FROM `menu_feedback` WHERE menu_id = 7 AND preference = 1 AND status = 1
+[GIN] 2025/07/08 - 14:14:15 | 200 |  271.783125ms |             ::1 | POST     "/api/v1/menu/getMenu"
+[GIN] 2025/07/08 - 14:19:00 | 200 |    1.087417ms |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/08 - 14:19:00 | 200 |     535.375µs |             ::1 | GET      "/swagger/swagger-ui-standalone-preset.js"
+[GIN] 2025/07/08 - 14:19:00 | 200 |     647.584µs |             ::1 | GET      "/swagger/swagger-ui.css"
+[GIN] 2025/07/08 - 14:19:00 | 200 |    2.251625ms |             ::1 | GET      "/swagger/swagger-ui-bundle.js"
+[GIN] 2025/07/08 - 14:19:00 | 200 |     313.542µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/08 - 14:19:00 | 200 |    2.326333ms |             ::1 | GET      "/swagger/favicon-32x32.png"
+[INFO][log.go:111]2025/07/08 14:21:22 /Users/mye/Git/jingliange_server/internal/repo/menu.go:68
+[36.173ms] [rows:1] SELECT * FROM `menu` WHERE id = 5 ORDER BY `menu`.`id` LIMIT 1
+[INFO][log.go:111]2025/07/08 14:21:22 /Users/mye/Git/jingliange_server/internal/repo/menu.go:167
+[35.444ms] [rows:1] SELECT * FROM `menu_feedback` WHERE menu_id = 5 AND user_id = 'xiaohei' AND status = 1 ORDER BY `menu_feedback`.`id` LIMIT 1
+[INFO][log.go:111]2025/07/08 14:21:22 /Users/mye/Git/jingliange_server/internal/repo/menu.go:171
+[128.180ms] [rows:1] UPDATE `menu_feedback` SET `comment`='非常好吃的菜品！' WHERE id = 1
+[GIN] 2025/07/08 - 14:21:22 | 200 |  310.201708ms |             ::1 | POST     "/api/v1/menu/comment"
+[GIN] 2025/07/08 - 14:21:50 | 400 |    135.1855ms |             ::1 | POST     "/api/admin/uploadMenuItem"
+[GIN] 2025/07/08 - 14:22:35 | 400 |  107.304959ms |             ::1 | POST     "/api/admin/uploadMenuItem"
+[GIN] 2025/07/08 - 14:28:42 | 200 |         643µs |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/08 - 14:28:42 | 200 |     339.959µs |             ::1 | GET      "/swagger/swagger-ui-standalone-preset.js"
+[GIN] 2025/07/08 - 14:28:42 | 200 |     310.542µs |             ::1 | GET      "/swagger/swagger-ui.css"
+[GIN] 2025/07/08 - 14:28:42 | 200 |    2.357583ms |             ::1 | GET      "/swagger/swagger-ui-bundle.js"
+[GIN] 2025/07/08 - 14:28:42 | 200 |     387.292µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/08 - 14:28:42 | 200 |    2.161792ms |             ::1 | GET      "/swagger/favicon-32x32.png"
+[GIN] 2025/07/08 - 14:33:02 | 400 |  143.357708ms |             ::1 | POST     "/api/admin/uploadMenuItem"
+[GIN] 2025/07/08 - 14:33:03 | 400 |  101.757333ms |             ::1 | POST     "/api/admin/uploadMenuItem"
+[GIN] 2025/07/08 - 14:33:04 | 400 |  108.582209ms |             ::1 | POST     "/api/admin/uploadMenuItem"
+[GIN] 2025/07/08 - 14:33:04 | 400 |  105.533542ms |             ::1 | POST     "/api/admin/uploadMenuItem"
+[GIN] 2025/07/08 - 14:33:05 | 400 |  106.046417ms |             ::1 | POST     "/api/admin/uploadMenuItem"
+[GIN] 2025/07/08 - 14:33:45 | 400 |  106.724917ms |             ::1 | POST     "/api/admin/uploadMenuItem"
+[INFO][log.go:111]2025/07/08 14:34:20 /Users/mye/Git/jingliange_server/internal/repo/menu.go:68
+[41.542ms] [rows:1] SELECT * FROM `menu` WHERE id = 5 ORDER BY `menu`.`id` LIMIT 1
+[INFO][log.go:111]2025/07/08 14:34:20 /Users/mye/Git/jingliange_server/internal/repo/menu.go:199
+[42.445ms] [rows:1] SELECT * FROM `menu_feedback` WHERE menu_id = 5 AND status = 1 AND comment != '' ORDER BY create_time DESC LIMIT 10
+[GIN] 2025/07/08 - 14:34:20 | 200 |  290.580459ms |             ::1 | POST     "/api/v1/menu/getComments"
+[GIN] 2025/07/08 - 14:40:17 | 200 |     424.959µs |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/08 - 14:40:17 | 200 |     149.833µs |             ::1 | GET      "/swagger/swagger-ui.css"
+[GIN] 2025/07/08 - 14:40:17 | 200 |     275.125µs |             ::1 | GET      "/swagger/swagger-ui-standalone-preset.js"
+[GIN] 2025/07/08 - 14:40:17 | 200 |    1.218709ms |             ::1 | GET      "/swagger/swagger-ui-bundle.js"
+[GIN] 2025/07/08 - 14:40:17 | 200 |     188.709µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/08 - 14:40:17 | 200 |    1.125083ms |             ::1 | GET      "/swagger/favicon-32x32.png"
+[GIN] 2025/07/08 - 14:41:16 | 404 |         583ns |             ::1 | GET      "/api/v1/menu/getMenuByID"
+[INFO][log.go:111]2025/07/08 14:41:35 /Users/mye/Git/jingliange_server/internal/repo/menu.go:214
+[34.706ms] [rows:1] SELECT * FROM `menu` WHERE id = 5 AND status = 1 ORDER BY `menu`.`id` LIMIT 1
+[INFO][log.go:111]2025/07/08 14:41:35 /Users/mye/Git/jingliange_server/internal/repo/menu.go:160
+[35.696ms] [rows:1] SELECT count(*) FROM `menu_feedback` WHERE menu_id = 5 AND preference = 1 AND status = 1
+[GIN] 2025/07/08 - 14:41:35 | 200 |  181.334333ms |             ::1 | POST     "/api/v1/menu/getMenuByID"
