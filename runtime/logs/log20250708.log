@@ -88,3 +88,33 @@
 [INFO][log.go:111]2025/07/08 14:41:35 /Users/mye/Git/jingliange_server/internal/repo/menu.go:160
 [35.696ms] [rows:1] SELECT count(*) FROM `menu_feedback` WHERE menu_id = 5 AND preference = 1 AND status = 1
 [GIN] 2025/07/08 - 14:41:35 | 200 |  181.334333ms |             ::1 | POST     "/api/v1/menu/getMenuByID"
+[GIN] 2025/07/08 - 15:02:47 | 200 |     664.833µs |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/08 - 15:02:47 | 200 |     538.833µs |             ::1 | GET      "/swagger/swagger-ui.css"
+[GIN] 2025/07/08 - 15:02:47 | 200 |     640.083µs |             ::1 | GET      "/swagger/swagger-ui-standalone-preset.js"
+[GIN] 2025/07/08 - 15:02:47 | 200 |    1.957208ms |             ::1 | GET      "/swagger/swagger-ui-bundle.js"
+[GIN] 2025/07/08 - 15:02:47 | 200 |     462.167µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/08 - 15:02:47 | 200 |    4.278667ms |             ::1 | GET      "/swagger/favicon-32x32.png"
+[GIN] 2025/07/08 - 15:05:20 | 400 |    133.0635ms |             ::1 | POST     "/api/v1/donation/createDonation"
+[INFO][log.go:111]2025/07/08 15:07:02 /Users/mye/Git/jingliange_server/internal/repo/donation.go:163
+[35.097ms] [rows:1] SELECT count(*) FROM `user` WHERE id = 'user123'
+[INFO][log.go:111]2025/07/08 15:07:02 /Users/mye/Git/jingliange_server/internal/repo/donation.go:90
+[79.334ms] [rows:1] INSERT INTO `donation` (`user_id`,`donor_name`,`amount`,`donate_time`,`is_visible`,`message`,`remarks`) VALUES ('user123','善心人士',100,'2025-07-08 15:07:02.879',1,'祝愿净莲阁越来越好','')
+[GIN] 2025/07/08 - 15:07:02 | 200 |  226.319208ms |             ::1 | POST     "/api/v1/donation/createDonation"
+[GIN] 2025/07/08 - 15:28:16 | 200 |    1.337208ms |             ::1 | GET      "/swagger/index.html"
+[GIN] 2025/07/08 - 15:28:17 | 200 |     326.583µs |             ::1 | GET      "/swagger/swagger-ui-standalone-preset.js"
+[GIN] 2025/07/08 - 15:28:17 | 200 |       285.5µs |             ::1 | GET      "/swagger/swagger-ui.css"
+[GIN] 2025/07/08 - 15:28:17 | 200 |    4.210833ms |             ::1 | GET      "/swagger/swagger-ui-bundle.js"
+[GIN] 2025/07/08 - 15:28:17 | 200 |     382.792µs |             ::1 | GET      "/swagger/doc.json"
+[GIN] 2025/07/08 - 15:28:17 | 200 |    2.761042ms |             ::1 | GET      "/swagger/favicon-32x32.png"
+[INFO][log.go:111]2025/07/08 15:29:11 /Users/mye/Git/jingliange_server/internal/repo/donation.go:150
+[33.927ms] [rows:0] SELECT * FROM `user` WHERE id = 'xiaohei' AND `user`.`id` = 'xiaohei' ORDER BY `user`.`id` LIMIT 1
+[INFO][log.go:111]2025/07/08 15:29:11 /Users/mye/Git/jingliange_server/internal/repo/donation.go:150
+[87.415ms] [rows:1] INSERT INTO `user` (`id`) VALUES ('xiaohei')
+[GIN] 2025/07/08 - 15:29:11 | 200 |  232.972125ms |             ::1 | POST     "/api/v1/auth/login"
+[GIN] 2025/07/08 - 15:30:09 | 401 |      65.292µs |             ::1 | POST     "/api/v1/donation/createDonation"
+[INFO][log.go:111]2025/07/08 15:32:45 /Users/mye/Git/jingliange_server/internal/repo/donation.go:90
+[93.255ms] [rows:1] INSERT INTO `donation` (`user_id`,`donor_name`,`amount`,`donate_time`,`is_visible`,`message`,`remarks`) VALUES ('xiaohei','善心人士',50,'2025-07-08 15:32:45.567',1,'祝愿净莲阁越来越好','')
+[GIN] 2025/07/08 - 15:32:45 | 200 |  295.200042ms |             ::1 | POST     "/api/v1/donation/createDonation"
+[INFO][log.go:111]2025/07/08 15:33:19 /Users/mye/Git/jingliange_server/internal/repo/donation.go:90
+[89.466ms] [rows:1] INSERT INTO `donation` (`user_id`,`donor_name`,`amount`,`donate_time`,`is_visible`,`message`,`remarks`) VALUES ('xiaohei','善心人士',100,'2025-07-08 15:33:19.526',1,'祝愿净莲阁越来越好','')
+[GIN] 2025/07/08 - 15:33:19 | 200 |  260.907875ms |             ::1 | POST     "/api/v1/donation/createDonation"

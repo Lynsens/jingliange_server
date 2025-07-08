@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lynsens/jingliange_server/pkg/logging"
 	"github.com/lynsens/jingliange_server/pkg/setting"
+	"github.com/lynsens/jingliange_server/pkg/util"
 
 	"fmt"
 
@@ -17,7 +18,8 @@ func init() {
 	// Load the configuration file
 	setting.Setup()
 	logging.Setup()
-
+	// 初始化JWT
+	util.InitJWT()
 }
 
 // @title Jingliange Server API
@@ -28,6 +30,11 @@ func init() {
 // @host https://jingliange.com
 // @BasePath /api/v1
 // @schemes http
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 func main() {
 	gin.SetMode(setting.ServerSetting.RunMode)
 

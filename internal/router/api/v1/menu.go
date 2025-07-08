@@ -60,13 +60,16 @@ func GetMenu(c *gin.Context) {
 }
 
 // @Summary 菜品点赞
-// @Description 用户为喜欢的菜品点赞或取消点赞
+// @Description 用户为喜欢的菜品点赞或取消点赞（需要JWT认证）
 // @Tags Menu
 // @Accept json
-// @Param like body model.MenuLikeRequest true "点赞参数" schemaexample({"menu_id":1,"user_id":"user123"})
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer token"
+// @Param like body model.MenuLikeRequest true "点赞参数" schemaexample({"menu_id":1})
 // @Produce  json
 // @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":"liked successfully"}"
 // @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
+// @Failure 401 {object} app.Response "{"code":401,"msg":"unauthorized","data":"Token required"}"
 // @Failure 404 {object} app.Response "{"code":404,"msg":"not found","data":"Menu item not found"}"
 // @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
 // @Router /api/v1/menu/like [post]
@@ -81,6 +84,13 @@ func LikeMenu(c *gin.Context) {
 
 	menuRepo := repo.NewMenuDB(db)
 
+	// 从JWT中获取用户ID
+	userID, exists := c.Get("user_id")
+	if !exists {
+		appG.Response(http.StatusUnauthorized, e.ERROR_AUTH, "User ID not found in token")
+		return
+	}
+
 	// 使用 body 参数
 	var likeReq model.MenuLikeRequest
 	if err := c.ShouldBindJSON(&likeReq); err != nil {
@@ -91,10 +101,6 @@ func LikeMenu(c *gin.Context) {
 	// 验证参数
 	if likeReq.MenuID <= 0 {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
-		return
-	}
-	if likeReq.UserID == "" {
-		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User ID is required")
 		return
 	}
 
@@ -116,7 +122,7 @@ func LikeMenu(c *gin.Context) {
 	}
 
 	// 检查当前点赞状态
-	currentStatus, err := menuRepo.GetMenuLikeStatus(likeReq.MenuID, likeReq.UserID)
+	currentStatus, err := menuRepo.GetMenuLikeStatus(likeReq.MenuID, userID.(string))
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		return
@@ -125,14 +131,14 @@ func LikeMenu(c *gin.Context) {
 	// 如果当前是喜欢状态，则取消点赞；否则点赞
 	if currentStatus == 1 {
 		// 取消点赞
-		if err := menuRepo.UnlikeMenu(likeReq.MenuID, likeReq.UserID); err != nil {
+		if err := menuRepo.UnlikeMenu(likeReq.MenuID, userID.(string)); err != nil {
 			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 			return
 		}
 		appG.Response(http.StatusOK, e.SUCCESS, "unliked successfully")
 	} else {
 		// 点赞
-		if err := menuRepo.LikeMenu(likeReq.MenuID, likeReq.UserID); err != nil {
+		if err := menuRepo.LikeMenu(likeReq.MenuID, userID.(string)); err != nil {
 			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 			return
 		}
@@ -141,13 +147,16 @@ func LikeMenu(c *gin.Context) {
 }
 
 // @Summary 获取菜品点赞状态
-// @Description 获取用户对特定菜品的点赞状态
+// @Description 获取用户对特定菜品的点赞状态（需要JWT认证）
 // @Tags Menu
 // @Accept json
-// @Param status body model.MenuLikeRequest true "查询参数" schemaexample({"menu_id":1,"user_id":"user123"})
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer token"
+// @Param status body model.MenuLikeRequest true "查询参数" schemaexample({"menu_id":1})
 // @Produce  json
 // @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":{"liked":true,"preference":1}}"
 // @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
+// @Failure 401 {object} app.Response "{"code":401,"msg":"unauthorized","data":"Token required"}"
 // @Failure 404 {object} app.Response "{"code":404,"msg":"not found","data":"Menu item not found"}"
 // @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
 // @Router /api/v1/menu/getLikeStatus [post]
@@ -162,6 +171,13 @@ func GetMenuLikeStatus(c *gin.Context) {
 
 	menuRepo := repo.NewMenuDB(db)
 
+	// 从JWT中获取用户ID
+	userID, exists := c.Get("user_id")
+	if !exists {
+		appG.Response(http.StatusUnauthorized, e.ERROR_AUTH, "User ID not found in token")
+		return
+	}
+
 	// 使用 body 参数
 	var statusReq model.MenuLikeRequest
 	if err := c.ShouldBindJSON(&statusReq); err != nil {
@@ -172,10 +188,6 @@ func GetMenuLikeStatus(c *gin.Context) {
 	// 验证参数
 	if statusReq.MenuID <= 0 {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
-		return
-	}
-	if statusReq.UserID == "" {
-		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User ID is required")
 		return
 	}
 
@@ -191,7 +203,7 @@ func GetMenuLikeStatus(c *gin.Context) {
 	}
 
 	// 获取点赞状态
-	preference, err := menuRepo.GetMenuLikeStatus(statusReq.MenuID, statusReq.UserID)
+	preference, err := menuRepo.GetMenuLikeStatus(statusReq.MenuID, userID.(string))
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		return
@@ -207,13 +219,16 @@ func GetMenuLikeStatus(c *gin.Context) {
 }
 
 // @Summary 菜品评论
-// @Description 用户对菜品进行评论
+// @Description 用户对菜品进行评论（需要JWT认证）
 // @Tags Menu
 // @Accept json
-// @Param comment body model.MenuCommentRequest true "评论参数" schemaexample({"menu_id":1,"user_id":"user123","comment":"非常好吃的菜品！"})
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer token"
+// @Param comment body model.MenuCommentRequest true "评论参数" schemaexample({"menu_id":1,"comment":"非常好吃的菜品！"})
 // @Produce  json
 // @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":"comment added successfully"}"
 // @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
+// @Failure 401 {object} app.Response "{"code":401,"msg":"unauthorized","data":"Token required"}"
 // @Failure 404 {object} app.Response "{"code":404,"msg":"not found","data":"Menu item not found"}"
 // @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
 // @Router /api/v1/menu/comment [post]
@@ -228,6 +243,13 @@ func CommentMenu(c *gin.Context) {
 
 	menuRepo := repo.NewMenuDB(db)
 
+	// 从JWT中获取用户ID
+	userID, exists := c.Get("user_id")
+	if !exists {
+		appG.Response(http.StatusUnauthorized, e.ERROR_AUTH, "User ID not found in token")
+		return
+	}
+
 	// 使用 body 参数
 	var commentReq model.MenuCommentRequest
 	if err := c.ShouldBindJSON(&commentReq); err != nil {
@@ -238,10 +260,6 @@ func CommentMenu(c *gin.Context) {
 	// 验证参数
 	if commentReq.MenuID <= 0 {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
-		return
-	}
-	if commentReq.UserID == "" {
-		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User ID is required")
 		return
 	}
 	if commentReq.Comment == "" {
@@ -267,7 +285,7 @@ func CommentMenu(c *gin.Context) {
 	}
 
 	// 添加评论
-	if err := menuRepo.CommentMenu(commentReq.MenuID, commentReq.UserID, commentReq.Comment); err != nil {
+	if err := menuRepo.CommentMenu(commentReq.MenuID, userID.(string), commentReq.Comment); err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		return
 	}

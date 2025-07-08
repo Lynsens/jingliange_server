@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.DeleteMenuRequest"
+                            "$ref": "#/definitions/model.DeleteMenuRequest"
                         }
                     }
                 ],
@@ -44,25 +44,25 @@ const docTemplate = `{
                     "200": {
                         "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid menu ID\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "404": {
                         "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -88,7 +88,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.Menu"
+                            "$ref": "#/definitions/model.Menu"
                         }
                     }
                 ],
@@ -96,19 +96,19 @@ const docTemplate = `{
                     "200": {
                         "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"id\":1,\"name\":\"豆腐汤\",\"image_url\":\"/images/tofusoup.jpg\",\"desc\":\"清淡营养的素食汤品，豆腐嫩滑，口感清香，富含植物蛋白\",\"nutrition\":\"...\",\"ingredients\":\"...\",\"status\":1}}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"All fields are required\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -134,7 +134,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.ActivityQueryRequest"
+                            "$ref": "#/definitions/model.ActivityQueryRequest"
                         }
                     }
                 ],
@@ -144,7 +144,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                                    "$ref": "#/definitions/app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -152,7 +152,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.Activity"
+                                                "$ref": "#/definitions/model.Activity"
                                             }
                                         }
                                     }
@@ -163,13 +163,13 @@ const docTemplate = `{
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -188,13 +188,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -216,13 +216,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                                    "$ref": "#/definitions/app.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.Image"
+                                            "$ref": "#/definitions/model.Image"
                                         }
                                     }
                                 }
@@ -232,7 +232,249 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "description": "简单的用户认证，基于微信小程序的用户ID，返回JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "用户认证",
+                "parameters": [
+                    {
+                        "description": "认证参数",
+                        "name": "auth",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AuthRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\"user_id\":\"user123\"}}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/donation/createDonation": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "用户支付成功后创建捐款记录（需要JWT认证）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Donation"
+                ],
+                "summary": "创建捐款记录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "捐款信息",
+                        "name": "donation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DonationCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":\"Donation created successfully\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "{\"code\":401,\"msg\":\"unauthorized\",\"data\":\"Token required\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/donation/getDonationList": {
+            "post": {
+                "description": "获取捐款记录列表，支持年份、时间段、昵称筛选，支持按时间或金额排序，支持分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Donation"
+                ],
+                "summary": "获取功德榜列表",
+                "parameters": [
+                    {
+                        "description": "查询参数",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DonationQueryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"user_id\":\"user123\",\"donor_name\":\"善心人士\",\"amount\":100.00,\"donate_time\":\"2025-07-08T10:00:00Z\",\"is_visible\":1,\"message\":\"祝愿净莲阁越来越好\"}]}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.Donation"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/donation/getDonationStats": {
+            "post": {
+                "description": "获取指定时间段的捐款统计信息，包括总金额和总人次",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Donation"
+                ],
+                "summary": "获取捐款统计",
+                "parameters": [
+                    {
+                        "description": "统计参数",
+                        "name": "stats",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DonationStatsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"total_amount\":5000.00,\"total_count\":50}}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.DonationStats"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -281,7 +523,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                                    "$ref": "#/definitions/app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -289,7 +531,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.Image"
+                                                "$ref": "#/definitions/model.Image"
                                             }
                                         }
                                     }
@@ -300,7 +542,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -308,7 +550,12 @@ const docTemplate = `{
         },
         "/api/v1/menu/comment": {
             "post": {
-                "description": "用户对菜品进行评论",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "用户对菜品进行评论（需要JWT认证）",
                 "consumes": [
                     "application/json"
                 ],
@@ -321,12 +568,19 @@ const docTemplate = `{
                 "summary": "菜品评论",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "评论参数",
                         "name": "comment",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuCommentRequest"
+                            "$ref": "#/definitions/model.MenuCommentRequest"
                         }
                     }
                 ],
@@ -334,25 +588,31 @@ const docTemplate = `{
                     "200": {
                         "description": "{\"code\":200,\"msg\":\"ok\",\"data\":\"comment added successfully\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "{\"code\":401,\"msg\":\"unauthorized\",\"data\":\"Token required\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "404": {
                         "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -378,7 +638,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuCommentsQueryRequest"
+                            "$ref": "#/definitions/model.MenuCommentsQueryRequest"
                         }
                     }
                 ],
@@ -388,7 +648,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                                    "$ref": "#/definitions/app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -396,7 +656,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuFeedback"
+                                                "$ref": "#/definitions/model.MenuFeedback"
                                             }
                                         }
                                     }
@@ -407,19 +667,19 @@ const docTemplate = `{
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "404": {
                         "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -427,7 +687,12 @@ const docTemplate = `{
         },
         "/api/v1/menu/getLikeStatus": {
             "post": {
-                "description": "获取用户对特定菜品的点赞状态",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取用户对特定菜品的点赞状态（需要JWT认证）",
                 "consumes": [
                     "application/json"
                 ],
@@ -440,12 +705,19 @@ const docTemplate = `{
                 "summary": "获取菜品点赞状态",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "查询参数",
                         "name": "status",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuLikeRequest"
+                            "$ref": "#/definitions/model.MenuLikeRequest"
                         }
                     }
                 ],
@@ -453,25 +725,31 @@ const docTemplate = `{
                     "200": {
                         "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"liked\":true,\"preference\":1}}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "{\"code\":401,\"msg\":\"unauthorized\",\"data\":\"Token required\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "404": {
                         "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -497,7 +775,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuQueryRequest"
+                            "$ref": "#/definitions/model.MenuQueryRequest"
                         }
                     }
                 ],
@@ -507,7 +785,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                                    "$ref": "#/definitions/app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -515,7 +793,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuWithLikes"
+                                                "$ref": "#/definitions/model.MenuWithLikes"
                                             }
                                         }
                                     }
@@ -526,13 +804,13 @@ const docTemplate = `{
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -558,7 +836,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuByIDRequest"
+                            "$ref": "#/definitions/model.MenuByIDRequest"
                         }
                     }
                 ],
@@ -568,13 +846,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                                    "$ref": "#/definitions/app.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuWithLikes"
+                                            "$ref": "#/definitions/model.MenuWithLikes"
                                         }
                                     }
                                 }
@@ -584,19 +862,19 @@ const docTemplate = `{
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "404": {
                         "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -604,7 +882,12 @@ const docTemplate = `{
         },
         "/api/v1/menu/like": {
             "post": {
-                "description": "用户为喜欢的菜品点赞或取消点赞",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "用户为喜欢的菜品点赞或取消点赞（需要JWT认证）",
                 "consumes": [
                     "application/json"
                 ],
@@ -617,12 +900,19 @@ const docTemplate = `{
                 "summary": "菜品点赞",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "点赞参数",
                         "name": "like",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuLikeRequest"
+                            "$ref": "#/definitions/model.MenuLikeRequest"
                         }
                     }
                 ],
@@ -630,25 +920,31 @@ const docTemplate = `{
                     "200": {
                         "description": "{\"code\":200,\"msg\":\"ok\",\"data\":\"liked successfully\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "400": {
                         "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid input data\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "{\"code\":401,\"msg\":\"unauthorized\",\"data\":\"Token required\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "404": {
                         "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -696,7 +992,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                                    "$ref": "#/definitions/app.Response"
                                 },
                                 {
                                     "type": "object",
@@ -715,13 +1011,13 @@ const docTemplate = `{
                     "400": {
                         "description": "参数错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     },
                     "500": {
                         "description": "服务器错误",
                         "schema": {
-                            "$ref": "#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response"
+                            "$ref": "#/definitions/app.Response"
                         }
                     }
                 }
@@ -729,7 +1025,19 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_lynsens_jingliange_server_internal_model.Activity": {
+        "app.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Activity": {
             "type": "object",
             "properties": {
                 "content": {
@@ -758,7 +1066,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.ActivityQueryRequest": {
+        "model.ActivityQueryRequest": {
             "type": "object",
             "properties": {
                 "page_number": {
@@ -773,7 +1081,17 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.DeleteMenuRequest": {
+        "model.AuthRequest": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "description": "用户ID（来自微信小程序）",
+                    "type": "string",
+                    "example": "user123"
+                }
+            }
+        },
+        "model.DeleteMenuRequest": {
             "type": "object",
             "properties": {
                 "id": {
@@ -783,7 +1101,149 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.Image": {
+        "model.Donation": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "description": "捐款金额（必填）",
+                    "type": "number",
+                    "example": 100
+                },
+                "create_time": {
+                    "type": "string",
+                    "example": "2025-07-08T10:00:00Z"
+                },
+                "donate_time": {
+                    "description": "捐款时间（必填）",
+                    "type": "string",
+                    "example": "2025-07-08T10:00:00Z"
+                },
+                "donor_name": {
+                    "description": "捐款人昵称（必填）",
+                    "type": "string",
+                    "example": "善心人士"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_visible": {
+                    "description": "是否显示在榜单：0隐藏，1显示",
+                    "type": "integer",
+                    "example": 1
+                },
+                "message": {
+                    "description": "留言",
+                    "type": "string",
+                    "example": "祝愿净莲阁越来越好"
+                },
+                "remarks": {
+                    "description": "备注",
+                    "type": "string",
+                    "example": ""
+                },
+                "update_time": {
+                    "type": "string",
+                    "example": "2025-07-08T10:00:00Z"
+                },
+                "user_id": {
+                    "description": "用户ID（必填）",
+                    "type": "string",
+                    "example": "user123"
+                }
+            }
+        },
+        "model.DonationCreateRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "description": "捐款金额",
+                    "type": "number",
+                    "example": 100
+                },
+                "donor_name": {
+                    "description": "捐款人昵称",
+                    "type": "string",
+                    "example": "善心人士"
+                },
+                "message": {
+                    "description": "留言",
+                    "type": "string",
+                    "example": "祝愿净莲阁越来越好"
+                }
+            }
+        },
+        "model.DonationQueryRequest": {
+            "type": "object",
+            "properties": {
+                "donor_name": {
+                    "description": "捐款人昵称搜索（模糊匹配）",
+                    "type": "string",
+                    "example": "善心"
+                },
+                "page_number": {
+                    "description": "页码，从零开始",
+                    "type": "integer",
+                    "example": 0
+                },
+                "page_size": {
+                    "description": "每页数量",
+                    "type": "integer",
+                    "example": 10
+                },
+                "period": {
+                    "description": "时间范围：all全年，first上半年，second下半年",
+                    "type": "string",
+                    "example": "all"
+                },
+                "sort_by": {
+                    "description": "排序方式：time时间，amount金额",
+                    "type": "string",
+                    "example": "time"
+                },
+                "sort_order": {
+                    "description": "排序顺序：desc降序，asc升序",
+                    "type": "string",
+                    "example": "desc"
+                },
+                "year": {
+                    "description": "年份，0表示不限制",
+                    "type": "integer",
+                    "example": 2025
+                }
+            }
+        },
+        "model.DonationStats": {
+            "type": "object",
+            "properties": {
+                "total_amount": {
+                    "description": "总捐款金额",
+                    "type": "number",
+                    "example": 5000
+                },
+                "total_count": {
+                    "description": "总捐款人次",
+                    "type": "integer",
+                    "example": 50
+                }
+            }
+        },
+        "model.DonationStatsRequest": {
+            "type": "object",
+            "properties": {
+                "period": {
+                    "description": "时间范围：all全年，first上半年，second下半年",
+                    "type": "string",
+                    "example": "all"
+                },
+                "year": {
+                    "description": "年份，0表示不限制",
+                    "type": "integer",
+                    "example": 2025
+                }
+            }
+        },
+        "model.Image": {
             "type": "object",
             "properties": {
                 "address": {
@@ -823,7 +1283,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.Menu": {
+        "model.Menu": {
             "type": "object",
             "properties": {
                 "create_time": {
@@ -868,7 +1328,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.MenuByIDRequest": {
+        "model.MenuByIDRequest": {
             "type": "object",
             "properties": {
                 "menu_id": {
@@ -878,7 +1338,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.MenuCommentRequest": {
+        "model.MenuCommentRequest": {
             "type": "object",
             "properties": {
                 "comment": {
@@ -890,15 +1350,10 @@ const docTemplate = `{
                     "description": "菜品ID",
                     "type": "integer",
                     "example": 1
-                },
-                "user_id": {
-                    "description": "用户ID",
-                    "type": "string",
-                    "example": "user123"
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.MenuCommentsQueryRequest": {
+        "model.MenuCommentsQueryRequest": {
             "type": "object",
             "properties": {
                 "menu_id": {
@@ -918,7 +1373,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.MenuFeedback": {
+        "model.MenuFeedback": {
             "type": "object",
             "properties": {
                 "comment": {
@@ -961,22 +1416,17 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.MenuLikeRequest": {
+        "model.MenuLikeRequest": {
             "type": "object",
             "properties": {
                 "menu_id": {
                     "description": "菜品ID",
                     "type": "integer",
                     "example": 1
-                },
-                "user_id": {
-                    "description": "用户ID",
-                    "type": "string",
-                    "example": "user123"
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.MenuQueryRequest": {
+        "model.MenuQueryRequest": {
             "type": "object",
             "properties": {
                 "name": {
@@ -996,7 +1446,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_lynsens_jingliange_server_internal_model.MenuWithLikes": {
+        "model.MenuWithLikes": {
             "type": "object",
             "properties": {
                 "create_time": {
@@ -1045,18 +1495,14 @@ const docTemplate = `{
                     "example": "2012-1-1"
                 }
             }
-        },
-        "github_com_lynsens_jingliange_server_pkg_app.Response": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "data": {},
-                "msg": {
-                    "type": "string"
-                }
-            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

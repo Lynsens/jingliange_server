@@ -1,6 +1,14 @@
 basePath: /api/v1
 definitions:
-  github_com_lynsens_jingliange_server_internal_model.Activity:
+  app.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      msg:
+        type: string
+    type: object
+  model.Activity:
     properties:
       content:
         type: string
@@ -20,7 +28,7 @@ definitions:
         description: Update time
         type: string
     type: object
-  github_com_lynsens_jingliange_server_internal_model.ActivityQueryRequest:
+  model.ActivityQueryRequest:
     properties:
       page_number:
         description: 页码，从零开始
@@ -31,14 +39,129 @@ definitions:
         example: 0
         type: integer
     type: object
-  github_com_lynsens_jingliange_server_internal_model.DeleteMenuRequest:
+  model.AuthRequest:
+    properties:
+      user_id:
+        description: 用户ID（来自微信小程序）
+        example: user123
+        type: string
+    type: object
+  model.DeleteMenuRequest:
     properties:
       id:
         description: 菜品ID
         example: 1
         type: integer
     type: object
-  github_com_lynsens_jingliange_server_internal_model.Image:
+  model.Donation:
+    properties:
+      amount:
+        description: 捐款金额（必填）
+        example: 100
+        type: number
+      create_time:
+        example: "2025-07-08T10:00:00Z"
+        type: string
+      donate_time:
+        description: 捐款时间（必填）
+        example: "2025-07-08T10:00:00Z"
+        type: string
+      donor_name:
+        description: 捐款人昵称（必填）
+        example: 善心人士
+        type: string
+      id:
+        example: 1
+        type: integer
+      is_visible:
+        description: 是否显示在榜单：0隐藏，1显示
+        example: 1
+        type: integer
+      message:
+        description: 留言
+        example: 祝愿净莲阁越来越好
+        type: string
+      remarks:
+        description: 备注
+        example: ""
+        type: string
+      update_time:
+        example: "2025-07-08T10:00:00Z"
+        type: string
+      user_id:
+        description: 用户ID（必填）
+        example: user123
+        type: string
+    type: object
+  model.DonationCreateRequest:
+    properties:
+      amount:
+        description: 捐款金额
+        example: 100
+        type: number
+      donor_name:
+        description: 捐款人昵称
+        example: 善心人士
+        type: string
+      message:
+        description: 留言
+        example: 祝愿净莲阁越来越好
+        type: string
+    type: object
+  model.DonationQueryRequest:
+    properties:
+      donor_name:
+        description: 捐款人昵称搜索（模糊匹配）
+        example: 善心
+        type: string
+      page_number:
+        description: 页码，从零开始
+        example: 0
+        type: integer
+      page_size:
+        description: 每页数量
+        example: 10
+        type: integer
+      period:
+        description: 时间范围：all全年，first上半年，second下半年
+        example: all
+        type: string
+      sort_by:
+        description: 排序方式：time时间，amount金额
+        example: time
+        type: string
+      sort_order:
+        description: 排序顺序：desc降序，asc升序
+        example: desc
+        type: string
+      year:
+        description: 年份，0表示不限制
+        example: 2025
+        type: integer
+    type: object
+  model.DonationStats:
+    properties:
+      total_amount:
+        description: 总捐款金额
+        example: 5000
+        type: number
+      total_count:
+        description: 总捐款人次
+        example: 50
+        type: integer
+    type: object
+  model.DonationStatsRequest:
+    properties:
+      period:
+        description: 时间范围：all全年，first上半年，second下半年
+        example: all
+        type: string
+      year:
+        description: 年份，0表示不限制
+        example: 2025
+        type: integer
+    type: object
+  model.Image:
     properties:
       address:
         example: /images/example.jpg
@@ -68,7 +191,7 @@ definitions:
         description: Update time
         type: string
     type: object
-  github_com_lynsens_jingliange_server_internal_model.Menu:
+  model.Menu:
     properties:
       create_time:
         description: Creation time
@@ -102,14 +225,14 @@ definitions:
         example: "2012-1-1"
         type: string
     type: object
-  github_com_lynsens_jingliange_server_internal_model.MenuByIDRequest:
+  model.MenuByIDRequest:
     properties:
       menu_id:
         description: 菜品ID
         example: 1
         type: integer
     type: object
-  github_com_lynsens_jingliange_server_internal_model.MenuCommentRequest:
+  model.MenuCommentRequest:
     properties:
       comment:
         description: 评论内容
@@ -119,12 +242,8 @@ definitions:
         description: 菜品ID
         example: 1
         type: integer
-      user_id:
-        description: 用户ID
-        example: user123
-        type: string
     type: object
-  github_com_lynsens_jingliange_server_internal_model.MenuCommentsQueryRequest:
+  model.MenuCommentsQueryRequest:
     properties:
       menu_id:
         description: 菜品ID
@@ -139,7 +258,7 @@ definitions:
         example: 10
         type: integer
     type: object
-  github_com_lynsens_jingliange_server_internal_model.MenuFeedback:
+  model.MenuFeedback:
     properties:
       comment:
         example: 非常好吃
@@ -172,18 +291,14 @@ definitions:
         example: user123
         type: string
     type: object
-  github_com_lynsens_jingliange_server_internal_model.MenuLikeRequest:
+  model.MenuLikeRequest:
     properties:
       menu_id:
         description: 菜品ID
         example: 1
         type: integer
-      user_id:
-        description: 用户ID
-        example: user123
-        type: string
     type: object
-  github_com_lynsens_jingliange_server_internal_model.MenuQueryRequest:
+  model.MenuQueryRequest:
     properties:
       name:
         description: 菜单名称，支持模糊匹配
@@ -198,7 +313,7 @@ definitions:
         example: 10
         type: integer
     type: object
-  github_com_lynsens_jingliange_server_internal_model.MenuWithLikes:
+  model.MenuWithLikes:
     properties:
       create_time:
         description: Creation time
@@ -236,14 +351,6 @@ definitions:
         example: "2012-1-1"
         type: string
     type: object
-  github_com_lynsens_jingliange_server_pkg_app.Response:
-    properties:
-      code:
-        type: integer
-      data: {}
-      msg:
-        type: string
-    type: object
 host: https://jingliange.com
 info:
   contact: {}
@@ -263,26 +370,26 @@ paths:
         name: delete
         required: true
         schema:
-          $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.DeleteMenuRequest'
+          $ref: '#/definitions/model.DeleteMenuRequest'
       produces:
       - application/json
       responses:
         "200":
           description: '{"code":200,"msg":"ok","data":null}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "400":
           description: '{"code":400,"msg":"invalid params","data":"Invalid menu ID"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "404":
           description: '{"code":404,"msg":"not found","data":"Menu item not found"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
       summary: 删除菜品
       tags:
       - Menu
@@ -297,23 +404,23 @@ paths:
         name: menu
         required: true
         schema:
-          $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.Menu'
+          $ref: '#/definitions/model.Menu'
       produces:
       - application/json
       responses:
         "200":
           description: '{"code":200,"msg":"ok","data":{"id":1,"name":"豆腐汤","image_url":"/images/tofusoup.jpg","desc":"清淡营养的素食汤品，豆腐嫩滑，口感清香，富含植物蛋白","nutrition":"...","ingredients":"...","status":1}}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "400":
           description: '{"code":400,"msg":"invalid params","data":"All fields are
             required"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
       summary: 上传菜品
       tags:
       - Menu
@@ -328,7 +435,7 @@ paths:
         name: query
         required: true
         schema:
-          $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.ActivityQueryRequest'
+          $ref: '#/definitions/model.ActivityQueryRequest'
       produces:
       - application/json
       responses:
@@ -336,21 +443,21 @@ paths:
           description: '{"code":200,"msg":"ok","data":[{"id":1,"title":"素食文化活动","content":"介绍素食文化","img":"/images/activity1.jpg","status":1}]}'
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            - $ref: '#/definitions/app.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.Activity'
+                    $ref: '#/definitions/model.Activity'
                   type: array
               type: object
         "400":
           description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
       summary: 获取活动列表
       tags:
       - About
@@ -362,11 +469,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
       summary: 获取净莲阁介绍
       tags:
       - About
@@ -380,18 +487,167 @@ paths:
           description: 成功返回头图信息
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            - $ref: '#/definitions/app.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.Image'
+                  $ref: '#/definitions/model.Image'
               type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
       summary: 获取头图
       tags:
       - About
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: 简单的用户认证，基于微信小程序的用户ID，返回JWT token
+      parameters:
+      - description: 认证参数
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/model.AuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...","user_id":"user123"}}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+        "400":
+          description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: '{"code":500,"msg":"internal server error","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 用户认证
+      tags:
+      - Auth
+  /api/v1/donation/createDonation:
+    post:
+      consumes:
+      - application/json
+      description: 用户支付成功后创建捐款记录（需要JWT认证）
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 捐款信息
+        in: body
+        name: donation
+        required: true
+        schema:
+          $ref: '#/definitions/model.DonationCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"Donation created successfully"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: '{"code":401,"msg":"unauthorized","data":"Token required"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: '{"code":500,"msg":"internal server error","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 创建捐款记录
+      tags:
+      - Donation
+  /api/v1/donation/getDonationList:
+    post:
+      consumes:
+      - application/json
+      description: 获取捐款记录列表，支持年份、时间段、昵称筛选，支持按时间或金额排序，支持分页
+      parameters:
+      - description: 查询参数
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/model.DonationQueryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":[{"id":1,"user_id":"user123","donor_name":"善心人士","amount":100.00,"donate_time":"2025-07-08T10:00:00Z","is_visible":1,"message":"祝愿净莲阁越来越好"}]}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Donation'
+                  type: array
+              type: object
+        "400":
+          description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: '{"code":500,"msg":"internal server error","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 获取功德榜列表
+      tags:
+      - Donation
+  /api/v1/donation/getDonationStats:
+    post:
+      consumes:
+      - application/json
+      description: 获取指定时间段的捐款统计信息，包括总金额和总人次
+      parameters:
+      - description: 统计参数
+        in: body
+        name: stats
+        required: true
+        schema:
+          $ref: '#/definitions/model.DonationStatsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":{"total_amount":5000.00,"total_count":50}}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.DonationStats'
+              type: object
+        "400":
+          description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: '{"code":500,"msg":"internal server error","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 获取捐款统计
+      tags:
+      - Donation
   /api/v1/getImageList:
     post:
       description: 获取净莲阁的图片列表。返回图片地址、简介、是否为头图等信息。类型为 0 表示活动图片，1 表示餐厅介绍图片。top_pic 为
@@ -424,49 +680,60 @@ paths:
           description: 成功返回图片列表
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            - $ref: '#/definitions/app.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.Image'
+                    $ref: '#/definitions/model.Image'
                   type: array
               type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
       summary: 获取图片列表
   /api/v1/menu/comment:
     post:
       consumes:
       - application/json
-      description: 用户对菜品进行评论
+      description: 用户对菜品进行评论（需要JWT认证）
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: 评论参数
         in: body
         name: comment
         required: true
         schema:
-          $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuCommentRequest'
+          $ref: '#/definitions/model.MenuCommentRequest'
       produces:
       - application/json
       responses:
         "200":
           description: '{"code":200,"msg":"ok","data":"comment added successfully"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "400":
           description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: '{"code":401,"msg":"unauthorized","data":"Token required"}'
+          schema:
+            $ref: '#/definitions/app.Response'
         "404":
           description: '{"code":404,"msg":"not found","data":"Menu item not found"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
       summary: 菜品评论
       tags:
       - Menu
@@ -481,7 +748,7 @@ paths:
         name: query
         required: true
         schema:
-          $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuCommentsQueryRequest'
+          $ref: '#/definitions/model.MenuCommentsQueryRequest'
       produces:
       - application/json
       responses:
@@ -489,25 +756,25 @@ paths:
           description: '{"code":200,"msg":"ok","data":[{"id":1,"menu_id":1,"user_id":"user123","preference":1,"comment":"非常好吃！","status":1}]}'
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            - $ref: '#/definitions/app.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuFeedback'
+                    $ref: '#/definitions/model.MenuFeedback'
                   type: array
               type: object
         "400":
           description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "404":
           description: '{"code":404,"msg":"not found","data":"Menu item not found"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
       summary: 获取菜品评论列表
       tags:
       - Menu
@@ -515,33 +782,44 @@ paths:
     post:
       consumes:
       - application/json
-      description: 获取用户对特定菜品的点赞状态
+      description: 获取用户对特定菜品的点赞状态（需要JWT认证）
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: 查询参数
         in: body
         name: status
         required: true
         schema:
-          $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuLikeRequest'
+          $ref: '#/definitions/model.MenuLikeRequest'
       produces:
       - application/json
       responses:
         "200":
           description: '{"code":200,"msg":"ok","data":{"liked":true,"preference":1}}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "400":
           description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: '{"code":401,"msg":"unauthorized","data":"Token required"}'
+          schema:
+            $ref: '#/definitions/app.Response'
         "404":
           description: '{"code":404,"msg":"not found","data":"Menu item not found"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
       summary: 获取菜品点赞状态
       tags:
       - Menu
@@ -556,7 +834,7 @@ paths:
         name: query
         required: true
         schema:
-          $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuQueryRequest'
+          $ref: '#/definitions/model.MenuQueryRequest'
       produces:
       - application/json
       responses:
@@ -564,21 +842,21 @@ paths:
           description: '{"code":200,"msg":"ok","data":[{"id":1,"name":"紫菜汤","image_url":"/images/menu.jpg","desc":"美味的菜品","nutrition":"...","ingredients":"...","status":1,"like_count":5}]}'
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            - $ref: '#/definitions/app.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuWithLikes'
+                    $ref: '#/definitions/model.MenuWithLikes'
                   type: array
               type: object
         "400":
           description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
       summary: 获取净莲阁的菜单
       tags:
       - Menu
@@ -593,7 +871,7 @@ paths:
         name: query
         required: true
         schema:
-          $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuByIDRequest'
+          $ref: '#/definitions/model.MenuByIDRequest'
       produces:
       - application/json
       responses:
@@ -601,23 +879,23 @@ paths:
           description: '{"code":200,"msg":"ok","data":{"id":1,"name":"紫菜汤","image_url":"/images/menu.jpg","desc":"美味的菜品","nutrition":"...","ingredients":"...","status":1,"like_count":5,"create_time":"2012-1-1","update_time":"2012-1-1"}}'
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            - $ref: '#/definitions/app.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuWithLikes'
+                  $ref: '#/definitions/model.MenuWithLikes'
               type: object
         "400":
           description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "404":
           description: '{"code":404,"msg":"not found","data":"Menu item not found"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
       summary: 获取单个菜品信息
       tags:
       - Menu
@@ -625,33 +903,44 @@ paths:
     post:
       consumes:
       - application/json
-      description: 用户为喜欢的菜品点赞或取消点赞
+      description: 用户为喜欢的菜品点赞或取消点赞（需要JWT认证）
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: 点赞参数
         in: body
         name: like
         required: true
         schema:
-          $ref: '#/definitions/github_com_lynsens_jingliange_server_internal_model.MenuLikeRequest'
+          $ref: '#/definitions/model.MenuLikeRequest'
       produces:
       - application/json
       responses:
         "200":
           description: '{"code":200,"msg":"ok","data":"liked successfully"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "400":
           description: '{"code":400,"msg":"invalid params","data":"Invalid input data"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: '{"code":401,"msg":"unauthorized","data":"Token required"}'
+          schema:
+            $ref: '#/definitions/app.Response'
         "404":
           description: '{"code":404,"msg":"not found","data":"Menu item not found"}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: '{"code":500,"msg":"internal server error","data":null}'
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
       summary: 菜品点赞
       tags:
       - Menu
@@ -685,7 +974,7 @@ paths:
           description: 成功
           schema:
             allOf:
-            - $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            - $ref: '#/definitions/app.Response'
             - properties:
                 data:
                   additionalProperties:
@@ -695,12 +984,18 @@ paths:
         "400":
           description: 参数错误
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
         "500":
           description: 服务器错误
           schema:
-            $ref: '#/definitions/github_com_lynsens_jingliange_server_pkg_app.Response'
+            $ref: '#/definitions/app.Response'
       summary: 上传图片
 schemes:
 - http
+securityDefinitions:
+  ApiKeyAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

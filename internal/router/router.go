@@ -9,16 +9,11 @@ import (
 	v1 "github.com/lynsens/jingliange_server/internal/router/api/v1"
 	"github.com/lynsens/jingliange_server/pkg/logging"
 	"github.com/lynsens/jingliange_server/pkg/upload"
+	"github.com/lynsens/jingliange_server/pkg/util"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 
 	_ "github.com/lynsens/jingliange_server/docs"
-	// "github.com/EDDYCJY/go-gin-example/middleware/jwt"
-	// "github.com/EDDYCJY/go-gin-example/pkg/export"
-	// "github.com/EDDYCJY/go-gin-example/pkg/qrcode"
-	// "github.com/EDDYCJY/go-gin-example/pkg/upload"
-	// "github.com/EDDYCJY/go-gin-example/routers/api"
-	// "github.com/EDDYCJY/go-gin-example/routers/api/v1"
 )
 
 // InitRouter initialize routing information
@@ -37,8 +32,8 @@ func InitRouter() *gin.Engine {
 	r.POST("/uploadImage", api.UploadImage)
 
 	apiv1 := r.Group("/api/v1")
-	// apiv1.Use(jwt.JWT())
 	{
+		// 公开接口（不需要认证）
 		//获取净莲阁介绍
 		apiv1.GET("/about/getDescription", v1.GetDescription)
 		//获取首页头图
@@ -51,22 +46,32 @@ func InitRouter() *gin.Engine {
 		apiv1.POST("/menu/getMenu", v1.GetMenu)
 		//获取单个菜品信息
 		apiv1.POST("/menu/getMenuByID", v1.GetMenuByID)
-		//菜品点赞
-		apiv1.POST("/menu/like", v1.LikeMenu)
-		//获取菜品点赞状态
-		apiv1.POST("/menu/getLikeStatus", v1.GetMenuLikeStatus)
-		//菜品评论
-		apiv1.POST("/menu/comment", v1.CommentMenu)
 		//获取菜品评论列表
 		apiv1.POST("/menu/getComments", v1.GetMenuComments)
-		// //更新指定文章
-		// apiv1.PUT("/articles/:id", v1.EditArticle)
-		// //删除指定文章
-		// apiv1.DELETE("/articles/:id", v1.DeleteArticle)
+		//获取功德榜列表
+		apiv1.POST("/donation/getDonationList", v1.GetDonationList)
+		//获取捐款统计
+		apiv1.POST("/donation/getDonationStats", v1.GetDonationStats)
+		//用户认证
+		apiv1.POST("/auth/login", v1.AuthUser)
+	}
+
+	// 需要认证的接口
+	apiAuth := r.Group("/api/v1")
+	apiAuth.Use(util.JWT())
+	{
+		//菜品点赞
+		apiAuth.POST("/menu/like", v1.LikeMenu)
+		//获取菜品点赞状态
+		apiAuth.POST("/menu/getLikeStatus", v1.GetMenuLikeStatus)
+		//菜品评论
+		apiAuth.POST("/menu/comment", v1.CommentMenu)
+		//创建捐款记录
+		apiAuth.POST("/donation/createDonation", v1.CreateDonation)
 	}
 
 	apiAdmin := r.Group("/api/admin")
-	// apiAdmin.Use(jwt.JWT())
+	apiAdmin.Use(util.JWT())
 	{
 		// 上传菜品
 		apiAdmin.POST("/uploadMenuItem", admin.UploadMenuItem)

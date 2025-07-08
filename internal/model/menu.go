@@ -37,16 +37,14 @@ type DeleteMenuRequest struct {
 	ID int `json:"id" example:"1"` // 菜品ID
 }
 
-// MenuLikeRequest 菜品点赞请求结构体
+// MenuLikeRequest 菜品点赞请求结构体（用户ID从JWT token中获取）
 type MenuLikeRequest struct {
-	MenuID int    `json:"menu_id" example:"1"`       // 菜品ID
-	UserID string `json:"user_id" example:"user123"` // 用户ID
+	MenuID int `json:"menu_id" example:"1"` // 菜品ID
 }
 
-// MenuCommentRequest 菜品评论请求结构体
+// MenuCommentRequest 菜品评论请求结构体（用户ID从JWT token中获取）
 type MenuCommentRequest struct {
 	MenuID  int    `json:"menu_id" example:"1"`        // 菜品ID
-	UserID  string `json:"user_id" example:"user123"`  // 用户ID
 	Comment string `json:"comment" example:"非常好吃的菜品！"` // 评论内容
 }
 

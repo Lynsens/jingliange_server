@@ -9,6 +9,7 @@ import (
 
 type App struct {
 	JwtSecret string
+	JwtExpire int
 	PageSize  int
 	PrefixUrl string
 

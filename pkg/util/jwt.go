@@ -4,27 +4,32 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/lynsens/jingliange_server/pkg/setting"
 )
 
 var jwtSecret []byte
 
 type Claims struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	UserID string `json:"user_id"`
 	jwt.StandardClaims
 }
 
-// GenerateToken generate tokens used for auth
-func GenerateToken(username, password string) (string, error) {
+// InitJWT 初始化JWT密钥
+func InitJWT() {
+	jwtSecret = []byte(setting.AppSetting.JwtSecret)
+}
+
+// GenerateToken 生成JWT token
+func GenerateToken(userID string) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(3 * time.Hour)
+	expireTime := nowTime.Add(time.Duration(setting.AppSetting.JwtExpire) * time.Hour)
 
 	claims := Claims{
-		EncodeMD5(username),
-		EncodeMD5(password),
-		jwt.StandardClaims{
+		UserID: userID,
+		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
-			Issuer:    "gin-blog",
+			IssuedAt:  nowTime.Unix(),
+			Issuer:    "jingliange_server",
 		},
 	}
 
@@ -34,7 +39,7 @@ func GenerateToken(username, password string) (string, error) {
 	return token, err
 }
 
-// ParseToken parsing token
+// ParseToken 解析JWT token
 func ParseToken(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
@@ -47,4 +52,10 @@ func ParseToken(token string) (*Claims, error) {
 	}
 
 	return nil, err
+}
+
+// ValidateToken 验证token是否有效
+func ValidateToken(token string) bool {
+	_, err := ParseToken(token)
+	return err == nil
 }
