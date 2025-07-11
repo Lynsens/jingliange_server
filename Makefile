@@ -1,74 +1,127 @@
 PROJECT_NAME := "jingliange_server"
 PKG := "github.com/lynsens/jingliange_server"
-PKG_LIST := $(shell go mod tidy && go list ${PKG}/...)
-BUS_PKG_LIST := $(shell go mod tidy && go list ${PKG}/... | grep -v stub_test)
-GO_FILES := $(shell find . -name '*.go' | grep -v _test.go)
-COVERAGE_PKG_LIST := $(shell go mod tidy && go list ${PKG}/... | grep -E -v "cmd|stub_test|pb")
-COVERAGE_PKGS := $(shell echo ${COVERAGE_PKG_LIST} | sed  "s/ /,/g")
-UNITTEST_COV = "unittest_cov"
 
+.DEFAULT_GOAL := help
+.PHONY: all build build-linux build-windows build-darwin build-all test test-full clean run swagger dev fmt lint deps install help
 
-.DEFAULT_GOAL := default
-.PHONY: all
+## help: 显示帮助信息
+help:
+	@echo "净莲阁后端项目 Makefile"
+	@echo ""
+	@echo "可用命令:"
+	@echo "  build         - 编译项目 (当前平台)"
+	@echo "  build-linux   - 编译Linux版本"
+	@echo "  build-windows - 编译Windows版本"
+	@echo "  build-darwin  - 编译macOS版本"
+	@echo "  build-all     - 编译所有平台版本"
+	@echo "  test          - 运行单元测试"
+	@echo "  test-full     - 运行完整测试套件"
+	@echo "  clean         - 清理构建文件"
+	@echo "  run           - 运行开发服务器"
+	@echo "  swagger       - 生成Swagger文档"
+	@echo "  dev           - 开发模式 (清理+编译+运行)"
+	@echo "  fmt           - 格式化代码"
+	@echo "  lint          - 代码检查"
+	@echo "  deps          - 更新依赖"
+	@echo "  install       - 安装开发工具"
+	@echo "  all           - 执行完整的开发流程"
+	@echo ""
 
-all: fmt lint vet test race build
+## build: 编译项目 (当前平台)
+build:
+	@echo "编译项目 (当前平台)..."
+	@go build -o bin/jingliange_server cmd/main.go
+	@echo "编译完成: bin/jingliange_server"
 
-clean-gen: ## Clean generated files
-	@echo "clean generated files..."
-	@	rm pb/*
-	# @   rm swagger/*
+## build-linux: 编译Linux版本
+build-linux:
+	@echo "编译Linux版本..."
+	@GOOS=linux GOARCH=amd64 go build -o bin/jingliange_server cmd/main.go
+	@echo "Linux版本编译完成: bin/jingliange_server_linux"
 
-gen: ## Generate protoc
-	@echo "go generate..."
-	@protoc --proto_path=proto proto/*.proto  --go_out=:pb --go-grpc_out=:pb --grpc-gateway_out=:pb  
-	# @protoc --proto_path=proto proto/*.proto  --go_out=:pb --go-grpc_out=:pb --grpc-gateway_out=:pb --openapiv2_out=:swagger
+## build-windows: 编译Windows版本
+build-windows:
+	@echo "编译Windows版本..."
+	@GOOS=windows GOARCH=amd64 go build -o bin/jingliange_server.exe cmd/main.go
+	@echo "Windows版本编译完成: bin/jingliange_server.exe"
 
-dep: ## Get dependencies
-	@echo "go dep..."
+## build-darwin: 编译macOS版本
+build-darwin:
+	@echo "编译macOS版本..."
+	@GOOS=darwin GOARCH=amd64 go build -o bin/jingliange_server cmd/main.go
+	@echo "macOS版本编译完成: bin/jingliange_server_darwin"
+
+## build-all: 编译所有平台版本
+build-all: build-linux build-windows build-darwin
+	@echo "所有平台版本编译完成"
+
+## test: 运行快速单元测试
+test:
+	@echo "运行单元测试..."
+	@go test ./pkg/util/jwt_simple_test.go ./pkg/util/jwt.go -v
+	@go test ./internal/router/api/v1/api_simple_test.go -v
+	@echo "单元测试完成"
+
+## test-full: 运行完整测试套件
+test-full:
+	@echo "运行完整测试套件..."
+	@./run_tests.sh
+
+## clean: 清理构建文件
+clean:
+	@echo "清理构建文件..."
+	@rm -f bin/jingliange_server
+	@rm -f bin/jingliange_server_linux
+	@rm -f bin/jingliange_server.exe
+	@rm -f bin/jingliange_server_darwin
+	@rm -f main
+	@echo "清理完成"
+
+## run: 运行开发服务器
+run: build
+	@echo "启动开发服务器..."
+	@./bin/jingliange_server
+
+## swagger: 生成Swagger文档
+swagger:
+	@echo "生成Swagger文档..."
+	@swag init -g cmd/main.go -o docs/
+	@echo "Swagger文档生成完成"
+
+## dev: 开发模式 (清理+编译+运行)
+dev: clean build
+	@echo "开发模式启动..."
+	@./bin/jingliange_server
+
+## fmt: 格式化代码
+fmt:
+	@echo "格式化代码..."
+	@go fmt ./...
+	@echo "代码格式化完成"
+
+## lint: 代码检查 (需要安装golangci-lint)
+lint:
+	@echo "代码检查..."
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		golangci-lint run; \
+	else \
+		echo "golangci-lint 未安装，跳过代码检查"; \
+		echo "安装命令: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"; \
+	fi
+
+## deps: 更新和整理依赖
+deps:
+	@echo "更新依赖..."
 	@go mod tidy
+	@go mod download
+	@echo "依赖更新完成"
 
-fmt: dep ## Format code
-	@echo "go fmt..."
-	@go fmt $(PKG_LIST)
+## install: 安装开发工具
+install:
+	@echo "安装开发工具..."
+	@go install github.com/swaggo/swag/cmd/swag@latest
+	@echo "开发工具安装完成"
 
-vet: dep ## Vet check
-	@echo "go vet..."
-	@go vet -all $(PKG_LIST)
-
-test: dep ## Run unittests
-	@echo "go test..."
-	@go test -short -v -count=1 -p=1 `go list ./... | grep -v stub_test` 2>&1||true
-
-race: dep ## Run data race detector
-	@echo "go test race..."
-	@go test -gcflags=all=-l -race -short -v -count=1 ${BUS_PKG_LIST}
-
-build: dep fmt ## Build frpc project
-	@echo "go build..."
-	@CGO_ENABLED=1 go build -v -buildmode=default -o bin/${PROJECT_NAME} cmd/main.go cmd/metrics.go cmd/clients.go
-#	@CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -gcflags=all="-N -l" -o bin/${PROJECT_NAME} cmd/main.go
-	@chmod +x bin/${PROJECT_NAME}
-
-build-dev: dep fmt ## Build  project
-	@echo "go build..."
-	@go build -v -gcflags=all="-N -l" -o bin/${PROJECT_NAME} cmd/main.go
-	@chmod +x bin/${PROJECT_NAME}
-
-build-linux: dep fmt ## Build project
-	@echo "go build for linux amd64..."
-	GOOS=linux GOARCH=amd64 go build -v -gcflags=all="-N -l" -o bin/${PROJECT_NAME} cmd/main.go
-	@chmod +x bin/${PROJECT_NAME}
-
-run: dep fmt ## Run  project
-	@echo "go run..."
-#   @go run cmd/main.go --config=conf/conf.toml
-	@go run cmd/main.go 
- 
-stub_test: fmt ## Run stub test
-	@echo "go run stub_test..."
-	@go test -gcflags=all=-l -v -count=1 ./stub_test/...
-
-help: ## Display this help screen
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
-
-default: help
+## all: 执行完整的开发流程
+all: clean fmt test build
+	@echo "完整开发流程执行完成"

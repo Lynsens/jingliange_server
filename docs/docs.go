@@ -757,7 +757,7 @@ const docTemplate = `{
         },
         "/api/v1/menu/getMenu": {
             "post": {
-                "description": "获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json、点赞数等信息。输入名称过滤菜单项，支持模糊匹配。",
+                "description": "获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json、点赞数等信息。输入名称过滤菜单项，支持模糊匹配。如果提供了JWT token，会返回用户的点赞状态。",
                 "consumes": [
                     "application/json"
                 ],
@@ -770,6 +770,12 @@ const docTemplate = `{
                 "summary": "获取净莲阁的菜单",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token (可选)",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
                         "description": "查询参数",
                         "name": "query",
                         "in": "body",
@@ -781,7 +787,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"name\":\"紫菜汤\",\"image_url\":\"/images/menu.jpg\",\"desc\":\"美味的菜品\",\"nutrition\":\"...\",\"ingredients\":\"...\",\"status\":1,\"like_count\":5}]}",
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"name\":\"紫菜汤\",\"image_url\":\"/images/menu.jpg\",\"desc\":\"美味的菜品\",\"nutrition\":\"...\",\"ingredients\":\"...\",\"status\":1,\"like_count\":5,\"liked\":true}]}",
                         "schema": {
                             "allOf": [
                                 {
@@ -793,7 +799,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/model.MenuWithLikes"
+                                                "$ref": "#/definitions/model.MenuWithUserLikes"
                                             }
                                         }
                                     }
@@ -1495,6 +1501,61 @@ const docTemplate = `{
                     "example": "2012-1-1"
                 }
             }
+        },
+        "model.MenuWithUserLikes": {
+            "type": "object",
+            "properties": {
+                "create_time": {
+                    "description": "Creation time",
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "美味的菜品"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "image_url": {
+                    "type": "string",
+                    "example": "/images/menu.jpg"
+                },
+                "ingredients": {
+                    "type": "string",
+                    "example": "{\"米\", \"豆腐\"}"
+                },
+                "like_count": {
+                    "description": "点赞数",
+                    "type": "integer",
+                    "example": 5
+                },
+                "liked": {
+                    "description": "当前用户是否已点赞",
+                    "type": "boolean",
+                    "example": true
+                },
+                "name": {
+                    "description": "菜品名称",
+                    "type": "string",
+                    "example": "紫菜汤"
+                },
+                "nutrition": {
+                    "type": "string",
+                    "example": "{\"protein\": \"10g\", \"carbs\": \"20g\", \"fat\": \"5g\"}"
+                },
+                "status": {
+                    "description": "状态：0 删除，1 正常",
+                    "type": "integer",
+                    "example": 1
+                },
+                "update_time": {
+                    "description": "Update time",
+                    "type": "string",
+                    "example": "2012-1-1"
+                }
+            }
         }
     },
     "securityDefinitions": {
@@ -1510,8 +1571,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "https://jingliange.com",
-	BasePath:         "/api/v1",
+	Host:             "49.234.22.169:8000",
+	BasePath:         "",
 	Schemes:          []string{"http"},
 	Title:            "Jingliange Server API",
 	Description:      "This is the backend API for Jingliange.",

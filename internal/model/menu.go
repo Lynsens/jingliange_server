@@ -61,6 +61,13 @@ type MenuWithLikes struct {
 	LikeCount int64 `json:"like_count" example:"5"` // 点赞数
 }
 
+// MenuWithUserLikes 包含点赞数和用户点赞状态的菜品信息
+type MenuWithUserLikes struct {
+	Menu
+	LikeCount int64 `json:"like_count" example:"5"` // 点赞数
+	Liked     bool  `json:"liked" example:"true"`   // 当前用户是否已点赞
+}
+
 // MenuByIDRequest 获取单个菜品请求结构体
 type MenuByIDRequest struct {
 	MenuID int `json:"menu_id" example:"1"` // 菜品ID

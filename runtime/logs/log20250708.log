@@ -118,3 +118,9 @@
 [INFO][log.go:111]2025/07/08 15:33:19 /Users/mye/Git/jingliange_server/internal/repo/donation.go:90
 [89.466ms] [rows:1] INSERT INTO `donation` (`user_id`,`donor_name`,`amount`,`donate_time`,`is_visible`,`message`,`remarks`) VALUES ('xiaohei','善心人士',100,'2025-07-08 15:33:19.526',1,'祝愿净莲阁越来越好','')
 [GIN] 2025/07/08 - 15:33:19 | 200 |  260.907875ms |             ::1 | POST     "/api/v1/donation/createDonation"
+[INFO][log.go:111]2025/07/08 16:58:06 /Users/mye/Git/jingliange_server/internal/repo/donation.go:150
+[39.149ms] [rows:1] SELECT * FROM `user` WHERE id = 'xiaohei' AND `user`.`id` = 'xiaohei' ORDER BY `user`.`id` LIMIT 1
+[GIN] 2025/07/08 - 16:58:06 | 200 |   158.60875ms |             ::1 | POST     "/api/v1/auth/login"
+[INFO][log.go:111]2025/07/08 16:58:48 /Users/mye/Git/jingliange_server/internal/repo/donation.go:90
+[109.393ms] [rows:1] INSERT INTO `donation` (`user_id`,`donor_name`,`amount`,`donate_time`,`is_visible`,`message`,`remarks`) VALUES ('xiaohei','小黑',50,'2025-07-08 16:58:48.719',1,'汪汪','')
+[GIN] 2025/07/08 - 16:58:48 | 200 |  250.871375ms |             ::1 | POST     "/api/v1/donation/createDonation"

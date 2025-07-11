@@ -2,6 +2,7 @@ package setting
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"github.com/go-ini/ini"
@@ -66,9 +67,16 @@ var cfg *ini.File
 // Setup initialize the configuration instance
 func Setup() {
 	var err error
-	cfg, err = ini.Load("conf/app.ini")
+	
+	// 优先尝试测试配置文件
+	configFile := "conf/app.ini"
+	if _, err := os.Stat("conf/app_test.ini"); err == nil {
+		configFile = "conf/app_test.ini"
+	}
+	
+	cfg, err = ini.Load(configFile)
 	if err != nil {
-		log.Fatalf("setting.Setup, fail to parse 'conf/app.ini': %v", err)
+		log.Fatalf("setting.Setup, fail to parse '%s': %v", configFile, err)
 	}
 
 	mapTo("app", AppSetting)

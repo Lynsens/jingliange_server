@@ -229,3 +229,53 @@ func (m *MenuDB) GetMenuByIDWithLikes(id int) (model.MenuWithLikes, error) {
 
 	return menuWithLikes, nil
 }
+
+// GetMenuListWithUserLikes 获取包含用户点赞状态的菜单列表
+func (m *MenuDB) GetMenuListWithUserLikes(pageSize, pageNumber int, name string, userID string) ([]model.MenuWithUserLikes, error) {
+	var menus []model.Menu
+	offset := pageNumber * pageSize
+
+	query := m.db.Table("menu").Where("status = ?", 1) // 只查询状态为1的菜品
+
+	// 添加模糊查询条件 - 搜索菜品名称和描述
+	if name != "" {
+		query = query.Where("(name LIKE ? OR `desc` LIKE ?)", "%"+name+"%", "%"+name+"%")
+	}
+
+	err := query.Offset(offset).Limit(pageSize).Find(&menus).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 为每个菜品获取点赞数和用户点赞状态
+	var menusWithUserLikes []model.MenuWithUserLikes
+	for _, menu := range menus {
+		likeCount, err := m.GetMenuLikeCount(menu.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		// 检查用户是否已点赞
+		var liked bool
+		if userID != "" {
+			preference, err := m.GetMenuLikeStatus(menu.ID, userID)
+			if err != nil {
+				// 如果查询出错，默认为未点赞
+				liked = false
+			} else {
+				liked = (preference == 1)
+			}
+		} else {
+			liked = false
+		}
+
+		menuWithUserLikes := model.MenuWithUserLikes{
+			Menu:      menu,
+			LikeCount: likeCount,
+			Liked:     liked,
+		}
+		menusWithUserLikes = append(menusWithUserLikes, menuWithUserLikes)
+	}
+
+	return menusWithUserLikes, nil
+}

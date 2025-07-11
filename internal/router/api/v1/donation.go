@@ -11,6 +11,7 @@ import (
 	"github.com/lynsens/jingliange_server/internal/repo"
 	"github.com/lynsens/jingliange_server/pkg/app"
 	"github.com/lynsens/jingliange_server/pkg/e"
+	"github.com/lynsens/jingliange_server/pkg/logging"
 	"github.com/lynsens/jingliange_server/pkg/setting"
 	"github.com/lynsens/jingliange_server/pkg/util"
 )
@@ -27,9 +28,11 @@ import (
 // @Router /api/v1/donation/getDonationList [post]
 func GetDonationList(c *gin.Context) {
 	appG := app.Gin{C: c}
+	logging.Info("GetDonationList - 开始处理获取功德榜列表请求")
 
 	db, err := repo.ConnectDb()
 	if err != nil {
+		logging.Error("GetDonationList - 数据库连接失败:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
 		return
 	}
@@ -39,9 +42,13 @@ func GetDonationList(c *gin.Context) {
 	// 使用 body 参数
 	var queryReq model.DonationQueryRequest
 	if err := c.ShouldBindJSON(&queryReq); err != nil {
+		logging.Error("GetDonationList - 参数绑定失败:", err)
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, fmt.Sprintf("Invalid input data: %v", err))
 		return
 	}
+
+	logging.Info("GetDonationList - 请求参数:", fmt.Sprintf("year=%d, period=%s, donor_name=%s, sort_by=%s, sort_order=%s, page_size=%d, page_number=%d",
+		queryReq.Year, queryReq.Period, queryReq.DonorName, queryReq.SortBy, queryReq.SortOrder, queryReq.PageSize, queryReq.PageNumber))
 
 	// 设置默认值
 	if queryReq.PageSize <= 0 {
@@ -66,25 +73,31 @@ func GetDonationList(c *gin.Context) {
 
 	// 验证参数
 	if queryReq.Period != "all" && queryReq.Period != "first" && queryReq.Period != "second" {
+		logging.Error("GetDonationList - 参数验证失败: period无效")
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid period, must be: all, first, or second")
 		return
 	}
 	if queryReq.SortBy != "time" && queryReq.SortBy != "amount" {
+		logging.Error("GetDonationList - 参数验证失败: sort_by无效")
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid sort_by, must be: time or amount")
 		return
 	}
 	if queryReq.SortOrder != "asc" && queryReq.SortOrder != "desc" {
+		logging.Error("GetDonationList - 参数验证失败: sort_order无效")
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid sort_order, must be: asc or desc")
 		return
 	}
 
 	// 获取捐款列表
+	logging.Info("GetDonationList - 开始查询捐款列表")
 	donations, err := donationRepo.GetDonationList(queryReq)
 	if err != nil {
+		logging.Error("GetDonationList - 查询捐款列表失败:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		return
 	}
 
+	logging.Info("GetDonationList - 成功获取捐款列表, 数量:", len(donations))
 	appG.Response(http.StatusOK, e.SUCCESS, donations)
 }
 
@@ -103,9 +116,11 @@ func GetDonationList(c *gin.Context) {
 // @Router /api/v1/donation/createDonation [post]
 func CreateDonation(c *gin.Context) {
 	appG := app.Gin{C: c}
+	logging.Info("CreateDonation - 开始处理创建捐款记录请求")
 
 	db, err := repo.ConnectDb()
 	if err != nil {
+		logging.Error("CreateDonation - 数据库连接失败:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
 		return
 	}
@@ -115,27 +130,37 @@ func CreateDonation(c *gin.Context) {
 	// 从JWT中获取用户ID
 	userID, exists := c.Get("user_id")
 	if !exists {
+		logging.Error("CreateDonation - JWT中未找到用户ID")
 		appG.Response(http.StatusUnauthorized, e.ERROR_AUTH, "User ID not found in token")
 		return
 	}
 
+	logging.Info("CreateDonation - 获取到用户ID:", userID)
+
 	// 使用 body 参数
 	var createReq model.DonationCreateRequest
 	if err := c.ShouldBindJSON(&createReq); err != nil {
+		logging.Error("CreateDonation - 参数绑定失败:", err)
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, fmt.Sprintf("Invalid input data: %v", err))
 		return
 	}
 
+	logging.Info("CreateDonation - 请求参数:", fmt.Sprintf("donor_name=%s, amount=%.2f, message=%s",
+		createReq.DonorName, createReq.Amount, createReq.Message))
+
 	// 验证必填参数
 	if createReq.DonorName == "" {
+		logging.Error("CreateDonation - 参数验证失败: donor_name为空")
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Donor name is required")
 		return
 	}
 	if createReq.Amount <= 0 {
+		logging.Error("CreateDonation - 参数验证失败: amount必须大于0")
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Amount must be greater than 0")
 		return
 	}
 	if createReq.Amount > 10000 {
+		logging.Error("CreateDonation - 参数验证失败: amount不能超过10000")
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Amount must not exceed 10000")
 		return
 	}
@@ -143,6 +168,7 @@ func CreateDonation(c *gin.Context) {
 	// 使用 utf8.RuneCountInString 来正确计算Unicode字符数
 	donorNameLength := utf8.RuneCountInString(createReq.DonorName)
 	if donorNameLength < 1 || donorNameLength > 10 {
+		logging.Error("CreateDonation - 参数验证失败: donor_name长度不符合要求")
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Donor name must be 1-10 characters")
 		return
 	}
@@ -158,11 +184,14 @@ func CreateDonation(c *gin.Context) {
 		Remarks:    "", // 管理员备注，初始为空
 	}
 
+	logging.Info("CreateDonation - 开始创建捐款记录")
 	if err := donationRepo.CreateDonation(donation); err != nil {
+		logging.Error("CreateDonation - 创建捐款记录失败:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		return
 	}
 
+	logging.Info("CreateDonation - 成功创建捐款记录, 用户:", userID, "金额:", createReq.Amount)
 	appG.Response(http.StatusOK, e.SUCCESS, "Donation created successfully")
 }
 
@@ -230,9 +259,11 @@ func GetDonationStats(c *gin.Context) {
 // @Router /api/v1/auth/login [post]
 func AuthUser(c *gin.Context) {
 	appG := app.Gin{C: c}
+	logging.Info("AuthUser - 开始处理用户认证请求")
 
 	db, err := repo.ConnectDb()
 	if err != nil {
+		logging.Error("AuthUser - 数据库连接失败:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
 		return
 	}
@@ -242,25 +273,33 @@ func AuthUser(c *gin.Context) {
 	// 使用 body 参数
 	var authReq model.AuthRequest
 	if err := c.ShouldBindJSON(&authReq); err != nil {
+		logging.Error("AuthUser - 参数绑定失败:", err)
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, fmt.Sprintf("Invalid input data: %v", err))
 		return
 	}
 
+	logging.Info("AuthUser - 认证用户:", authReq.UserID)
+
 	// 验证参数
 	if authReq.UserID == "" {
+		logging.Error("AuthUser - 参数验证失败: user_id为空")
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User ID is required")
 		return
 	}
 
 	// 创建或更新用户记录
+	logging.Info("AuthUser - 开始创建或更新用户记录")
 	if err := userRepo.CreateOrUpdateUser(authReq.UserID); err != nil {
+		logging.Error("AuthUser - 创建或更新用户记录失败:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		return
 	}
 
 	// 生成JWT token
+	logging.Info("AuthUser - 开始生成JWT token")
 	token, err := util.GenerateToken(authReq.UserID)
 	if err != nil {
+		logging.Error("AuthUser - 生成JWT token失败:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		return
 	}
@@ -271,6 +310,7 @@ func AuthUser(c *gin.Context) {
 		"user_id": authReq.UserID,
 	}
 
+	logging.Info("AuthUser - 用户认证成功, 用户ID:", authReq.UserID)
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }
 

@@ -10,25 +10,29 @@ import (
 	"github.com/lynsens/jingliange_server/internal/repo"
 	"github.com/lynsens/jingliange_server/pkg/app"
 	"github.com/lynsens/jingliange_server/pkg/e"
+	"github.com/lynsens/jingliange_server/pkg/logging"
 	"github.com/lynsens/jingliange_server/pkg/setting"
 	"gorm.io/gorm"
 )
 
 // @Summary 获取净莲阁的菜单
-// @Description 获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json、点赞数等信息。输入名称过滤菜单项，支持模糊匹配。
+// @Description 获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json、点赞数等信息。输入名称过滤菜单项，支持模糊匹配。如果提供了JWT token，会返回用户的点赞状态。
 // @Tags  Menu
 // @Accept json
+// @Param Authorization header string false "Bearer token (可选)"
 // @Param query body model.MenuQueryRequest true "查询参数" schemaexample({"name":"紫菜汤","page_size":10,"page_number":0})
 // @Produce  json
-// @Success 200 {object} app.Response{data=[]model.MenuWithLikes} "{"code":200,"msg":"ok","data":[{"id":1,"name":"紫菜汤","image_url":"/images/menu.jpg","desc":"美味的菜品","nutrition":"...","ingredients":"...","status":1,"like_count":5}]}"
+// @Success 200 {object} app.Response{data=[]model.MenuWithUserLikes} "{"code":200,"msg":"ok","data":[{"id":1,"name":"紫菜汤","image_url":"/images/menu.jpg","desc":"美味的菜品","nutrition":"...","ingredients":"...","status":1,"like_count":5,"liked":true}]}"
 // @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
 // @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
 // @Router /api/v1/menu/getMenu [post]
 func GetMenu(c *gin.Context) {
 	appG := app.Gin{C: c}
+	logging.Info("GetMenu - 开始处理获取菜单列表请求")
 
 	db, err := repo.ConnectDb()
 	if err != nil {
+		logging.Error("GetMenu - 数据库连接失败:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
 		return
 	}
@@ -38,9 +42,13 @@ func GetMenu(c *gin.Context) {
 	// 使用 body 参数
 	var queryReq model.MenuQueryRequest
 	if err := c.ShouldBindJSON(&queryReq); err != nil {
+		logging.Error("GetMenu - 参数绑定失败:", err)
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
 		return
 	}
+
+	logging.Info("GetMenu - 请求参数:", fmt.Sprintf("name=%s, page_size=%d, page_number=%d",
+		queryReq.Name, queryReq.PageSize, queryReq.PageNumber))
 
 	// 设置默认值
 	if queryReq.PageSize <= 0 {
@@ -50,13 +58,26 @@ func GetMenu(c *gin.Context) {
 		queryReq.PageNumber = 0
 	}
 
-	activityList, err := repo.GetMenuList(queryReq.PageSize, queryReq.PageNumber, queryReq.Name)
+	// 检查是否有用户认证信息
+	userID, exists := c.Get("user_id")
+	var userIDStr string
+	if exists {
+		userIDStr = userID.(string)
+		logging.Info("GetMenu - 检测到已认证用户:", userIDStr)
+	} else {
+		logging.Info("GetMenu - 未检测到用户认证，返回公开信息")
+	}
+
+	// 使用包含用户点赞状态的方法获取菜单列表
+	menuList, err := repo.GetMenuListWithUserLikes(queryReq.PageSize, queryReq.PageNumber, queryReq.Name, userIDStr)
 	if err != nil {
+		logging.Error("GetMenu - 查询菜单列表失败:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		return
 	}
 
-	appG.Response(http.StatusOK, e.SUCCESS, activityList)
+	logging.Info("GetMenu - 成功获取菜单列表, 数量:", len(menuList))
+	appG.Response(http.StatusOK, e.SUCCESS, menuList)
 }
 
 // @Summary 菜品点赞
@@ -75,9 +96,11 @@ func GetMenu(c *gin.Context) {
 // @Router /api/v1/menu/like [post]
 func LikeMenu(c *gin.Context) {
 	appG := app.Gin{C: c}
+	logging.Info("LikeMenu - 开始处理菜品点赞请求")
 
 	db, err := repo.ConnectDb()
 	if err != nil {
+		logging.Error("LikeMenu - 数据库连接失败:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
 		return
 	}
@@ -87,19 +110,26 @@ func LikeMenu(c *gin.Context) {
 	// 从JWT中获取用户ID
 	userID, exists := c.Get("user_id")
 	if !exists {
+		logging.Error("LikeMenu - JWT中未找到用户ID")
 		appG.Response(http.StatusUnauthorized, e.ERROR_AUTH, "User ID not found in token")
 		return
 	}
 
+	logging.Info("LikeMenu - 获取到用户ID:", userID)
+
 	// 使用 body 参数
 	var likeReq model.MenuLikeRequest
 	if err := c.ShouldBindJSON(&likeReq); err != nil {
+		logging.Error("LikeMenu - 参数绑定失败:", err)
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
 		return
 	}
 
+	logging.Info("LikeMenu - 请求参数: menu_id=", likeReq.MenuID)
+
 	// 验证参数
 	if likeReq.MenuID <= 0 {
+		logging.Error("LikeMenu - 参数验证失败: menu_id无效")
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
 		return
 	}
@@ -108,6 +138,7 @@ func LikeMenu(c *gin.Context) {
 	existingMenu, err := menuRepo.GetMenuByID(likeReq.MenuID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			logging.Error("LikeMenu - 菜品不存在:", likeReq.MenuID)
 			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
 		} else {
 			appG.Response(http.StatusInternalServerError, e.ERROR, nil)

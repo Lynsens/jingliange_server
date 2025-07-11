@@ -42,8 +42,6 @@ func InitRouter() *gin.Engine {
 		apiv1.POST("/about/getActivityList", v1.GetActivityList)
 		//获取图片列表
 		apiv1.POST("/about/getImageList", v1.GetImangeList)
-		//获取菜单
-		apiv1.POST("/menu/getMenu", v1.GetMenu)
 		//获取单个菜品信息
 		apiv1.POST("/menu/getMenuByID", v1.GetMenuByID)
 		//获取菜品评论列表
@@ -54,6 +52,14 @@ func InitRouter() *gin.Engine {
 		apiv1.POST("/donation/getDonationStats", v1.GetDonationStats)
 		//用户认证
 		apiv1.POST("/auth/login", v1.AuthUser)
+	}
+
+	// 支持可选认证的接口（有token显示个人信息，无token显示公开信息）
+	apiOptional := r.Group("/api/v1")
+	apiOptional.Use(util.OptionalJWT())
+	{
+		//获取菜单（支持显示用户点赞状态）
+		apiOptional.POST("/menu/getMenu", v1.GetMenu)
 	}
 
 	// 需要认证的接口

@@ -1,4 +1,3 @@
-basePath: /api/v1
 definitions:
   app.Response:
     properties:
@@ -351,7 +350,49 @@ definitions:
         example: "2012-1-1"
         type: string
     type: object
-host: https://jingliange.com
+  model.MenuWithUserLikes:
+    properties:
+      create_time:
+        description: Creation time
+        example: "2012-1-1"
+        type: string
+      desc:
+        example: 美味的菜品
+        type: string
+      id:
+        example: 1
+        type: integer
+      image_url:
+        example: /images/menu.jpg
+        type: string
+      ingredients:
+        example: '{"米", "豆腐"}'
+        type: string
+      like_count:
+        description: 点赞数
+        example: 5
+        type: integer
+      liked:
+        description: 当前用户是否已点赞
+        example: true
+        type: boolean
+      name:
+        description: 菜品名称
+        example: 紫菜汤
+        type: string
+      nutrition:
+        example: '{"protein": "10g", "carbs": "20g", "fat": "5g"}'
+        type: string
+      status:
+        description: 状态：0 删除，1 正常
+        example: 1
+        type: integer
+      update_time:
+        description: Update time
+        example: "2012-1-1"
+        type: string
+    type: object
+host: 49.234.22.169:8000
 info:
   contact: {}
   description: This is the backend API for Jingliange.
@@ -827,8 +868,13 @@ paths:
     post:
       consumes:
       - application/json
-      description: 获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json、点赞数等信息。输入名称过滤菜单项，支持模糊匹配。
+      description: 获取全部净莲阁菜单，返回菜单项列表，每个菜单项包含名称、图片 url、营养价值表 json、点赞数等信息。输入名称过滤菜单项，支持模糊匹配。如果提供了JWT
+        token，会返回用户的点赞状态。
       parameters:
+      - description: Bearer token (可选)
+        in: header
+        name: Authorization
+        type: string
       - description: 查询参数
         in: body
         name: query
@@ -839,14 +885,14 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"msg":"ok","data":[{"id":1,"name":"紫菜汤","image_url":"/images/menu.jpg","desc":"美味的菜品","nutrition":"...","ingredients":"...","status":1,"like_count":5}]}'
+          description: '{"code":200,"msg":"ok","data":[{"id":1,"name":"紫菜汤","image_url":"/images/menu.jpg","desc":"美味的菜品","nutrition":"...","ingredients":"...","status":1,"like_count":5,"liked":true}]}'
           schema:
             allOf:
             - $ref: '#/definitions/app.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/model.MenuWithLikes'
+                    $ref: '#/definitions/model.MenuWithUserLikes'
                   type: array
               type: object
         "400":
