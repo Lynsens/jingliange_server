@@ -40,6 +40,9 @@ func JWT() gin.HandlerFunc {
 				} else {
 					// 将用户ID存入上下文
 					c.Set("user_id", claims.UserID)
+					if claims.Role != "" {
+						c.Set("role", claims.Role)
+					}
 					logging.Info("JWT中间件 - token验证成功, 用户ID:", claims.UserID)
 				}
 			}

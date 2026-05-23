@@ -25,6 +25,9 @@ func OptionalJWT() gin.HandlerFunc {
 				} else {
 					// token有效，设置用户ID
 					c.Set("user_id", claims.UserID)
+					if claims.Role != "" {
+						c.Set("role", claims.Role)
+					}
 					logging.Info("OptionalJWT中间件 - token验证成功, 用户ID:", claims.UserID)
 				}
 			}

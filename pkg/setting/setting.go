@@ -52,6 +52,13 @@ type Database struct {
 
 var DatabaseSetting = &Database{}
 
+type Admin struct {
+	Username     string
+	PasswordHash string
+}
+
+var AdminSetting = &Admin{}
+
 type Redis struct {
 	Host        string
 	Password    string
@@ -67,13 +74,13 @@ var cfg *ini.File
 // Setup initialize the configuration instance
 func Setup() {
 	var err error
-	
+
 	// 优先尝试测试配置文件
 	configFile := "conf/app.ini"
 	if _, err := os.Stat("conf/app_test.ini"); err == nil {
 		configFile = "conf/app_test.ini"
 	}
-	
+
 	cfg, err = ini.Load(configFile)
 	if err != nil {
 		log.Fatalf("setting.Setup, fail to parse '%s': %v", configFile, err)
@@ -82,6 +89,7 @@ func Setup() {
 	mapTo("app", AppSetting)
 	mapTo("server", ServerSetting)
 	mapTo("database", DatabaseSetting)
+	mapTo("admin", AdminSetting)
 	mapTo("redis", RedisSetting)
 
 	AppSetting.ImageMaxSize = AppSetting.ImageMaxSize * 1024 * 1024

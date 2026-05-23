@@ -19,11 +19,11 @@ import (
 func init() {
 	// 设置Gin为测试模式
 	gin.SetMode(gin.TestMode)
-	
+
 	// 获取当前工作目录并切换到项目根目录
 	wd, _ := os.Getwd()
 	originalWd := wd
-	
+
 	// 找到项目根目录（包含go.mod的目录）
 	for {
 		if _, err := os.Stat(filepath.Join(wd, "go.mod")); err == nil {
@@ -38,13 +38,13 @@ func init() {
 		}
 		wd = parent
 	}
-	
+
 	// 加载配置
 	setting.Setup()
-	
+
 	// 初始化日志
 	logging.Setup()
-	
+
 	// 初始化JWT
 	InitJWT()
 }
@@ -141,6 +141,68 @@ func TestJWTMiddleware(t *testing.T) {
 				// 由于JWT中间件直接调用c.Abort()，我们主要验证状态码
 				// 这里简化了测试验证
 			}
+		})
+	}
+}
+
+func TestAdminJWTMiddleware(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	adminToken, err := GenerateAdminToken("admin")
+	assert.NoError(t, err)
+	userToken, err := GenerateToken("test_user")
+	assert.NoError(t, err)
+
+	tests := []struct {
+		name         string
+		authHeader   string
+		expectedCode int
+	}{
+		{
+			name:         "valid admin token",
+			authHeader:   "Bearer " + adminToken,
+			expectedCode: http.StatusOK,
+		},
+		{
+			name:         "missing token",
+			authHeader:   "",
+			expectedCode: http.StatusUnauthorized,
+		},
+		{
+			name:         "invalid token",
+			authHeader:   "Bearer invalid_token",
+			expectedCode: http.StatusUnauthorized,
+		},
+		{
+			name:         "normal user token",
+			authHeader:   "Bearer " + userToken,
+			expectedCode: http.StatusUnauthorized,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			router := gin.New()
+			router.Use(AdminJWT())
+			router.GET("/admin-only", func(c *gin.Context) {
+				userID, _ := c.Get("user_id")
+				role, _ := c.Get("role")
+				c.JSON(http.StatusOK, gin.H{
+					"user_id": userID,
+					"role":    role,
+				})
+			})
+
+			req, err := http.NewRequest("GET", "/admin-only", nil)
+			assert.NoError(t, err)
+			if tt.authHeader != "" {
+				req.Header.Set("Authorization", tt.authHeader)
+			}
+
+			w := httptest.NewRecorder()
+			router.ServeHTTP(w, req)
+
+			assert.Equal(t, tt.expectedCode, w.Code)
 		})
 	}
 }
@@ -260,10 +322,23 @@ func TestJWTGeneration(t *testing.T) {
 				claims, err := ParseToken(token)
 				assert.NoError(t, err)
 				assert.Equal(t, tt.userID, claims.UserID)
+				assert.Empty(t, claims.Role)
 				assert.True(t, claims.ExpiresAt > time.Now().Unix())
 			}
 		})
 	}
+}
+
+func TestAdminJWTGeneration(t *testing.T) {
+	token, err := GenerateAdminToken("admin")
+	assert.NoError(t, err)
+	assert.NotEmpty(t, token)
+
+	claims, err := ParseToken(token)
+	assert.NoError(t, err)
+	assert.Equal(t, "admin", claims.UserID)
+	assert.Equal(t, AdminRole, claims.Role)
+	assert.True(t, claims.ExpiresAt > time.Now().Unix())
 }
 
 func TestJWTParsing(t *testing.T) {

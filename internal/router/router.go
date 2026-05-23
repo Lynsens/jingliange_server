@@ -77,7 +77,8 @@ func InitRouter() *gin.Engine {
 	}
 
 	apiAdmin := r.Group("/api/admin")
-	apiAdmin.Use(util.JWT())
+	apiAdmin.POST("/login", admin.Login)
+	apiAdmin.Use(util.AdminJWT())
 	{
 		// 上传菜品
 		apiAdmin.POST("/uploadMenuItem", admin.UploadMenuItem)

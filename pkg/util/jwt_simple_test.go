@@ -47,6 +47,7 @@ func TestJWTTokenGeneration(t *testing.T) {
 			claims, err := ParseToken(token)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.userID, claims.UserID)
+			assert.Empty(t, claims.Role)
 			assert.True(t, claims.ExpiresAt > time.Now().Unix())
 		})
 	}
@@ -138,6 +139,7 @@ func TestJWTTokenRoundTrip(t *testing.T) {
 
 	// 验证数据一致性
 	assert.Equal(t, originalUserID, claims.UserID)
+	assert.Empty(t, claims.Role)
 	assert.True(t, claims.ExpiresAt > time.Now().Unix())
 }
 
@@ -159,5 +161,6 @@ func TestJWTMultipleTokens(t *testing.T) {
 		claims, err := ParseToken(token)
 		assert.NoError(t, err)
 		assert.Equal(t, userID, claims.UserID)
+		assert.Empty(t, claims.Role)
 	}
 }

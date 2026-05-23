@@ -9,8 +9,11 @@ import (
 
 var jwtSecret []byte
 
+const AdminRole = "admin"
+
 type Claims struct {
 	UserID string `json:"user_id"`
+	Role   string `json:"role,omitempty"`
 	jwt.StandardClaims
 }
 
@@ -21,11 +24,21 @@ func InitJWT() {
 
 // GenerateToken 生成JWT token
 func GenerateToken(userID string) (string, error) {
+	return generateToken(userID, "")
+}
+
+// GenerateAdminToken 生成管理员JWT token
+func GenerateAdminToken(username string) (string, error) {
+	return generateToken(username, AdminRole)
+}
+
+func generateToken(userID, role string) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(time.Duration(setting.AppSetting.JwtExpire) * time.Hour)
 
 	claims := Claims{
 		UserID: userID,
+		Role:   role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
 			IssuedAt:  nowTime.Unix(),
