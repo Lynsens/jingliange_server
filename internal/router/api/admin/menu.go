@@ -59,6 +59,68 @@ func UploadMenuItem(c *gin.Context) {
 	appG.Response(http.StatusOK, e.SUCCESS, menuItem)
 }
 
+// @Summary 更新菜品
+// @Description 根据菜品ID更新名称、图片url、简介、营养价值表和主要成分。营养价值表和主要成分需要以JSON字符串格式提供。
+// @Tags Menu
+// @Accept json
+// @Param menu body model.Menu true "菜品信息"
+// @Produce json
+// @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":{"id":1,"name":"豆腐汤","image_url":"/images/tofusoup.jpg","desc":"清淡营养的素食汤品","nutrition":"...","ingredients":"...","status":1}}"
+// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"All fields are required"}"
+// @Failure 404 {object} app.Response "{"code":500,"msg":"fail","data":"Menu item not found"}"
+// @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
+// @Router /api/admin/updateMenuItem [put]
+func UpdateMenuItem(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	repo := repo.NewMenuDB(db)
+
+	var menuItem model.Menu
+	if err := c.ShouldBindJSON(&menuItem); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
+		return
+	}
+
+	if menuItem.ID <= 0 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
+		return
+	}
+
+	if menuItem.Name == "" || menuItem.Image_url == "" || menuItem.Desc == "" || menuItem.Nutrition == "" || menuItem.Ingredients == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "All fields are required")
+		return
+	}
+
+	existingMenu, err := repo.GetMenuByID(menuItem.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
+		} else {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		}
+		return
+	}
+
+	if existingMenu.Status == 0 {
+		appG.Response(http.StatusNotFound, e.ERROR, "Menu item already deleted")
+		return
+	}
+
+	menuItem.Status = 1
+	if err := repo.UpdateMenu(menuItem); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, menuItem)
+}
+
 // @Summary 删除菜品
 // @Description 根据菜品ID删除菜品（软删除，将状态标记为0）
 // @Tags Menu

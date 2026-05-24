@@ -52,6 +52,8 @@ func InitRouter() *gin.Engine {
 		apiv1.POST("/donation/getDonationStats", v1.GetDonationStats)
 		//用户认证
 		apiv1.POST("/auth/login", v1.AuthUser)
+		//上传图片
+		apiv1.POST("/uploadImage", api.UploadImage)
 	}
 
 	// 支持可选认证的接口（有token显示个人信息，无token显示公开信息）
@@ -82,6 +84,8 @@ func InitRouter() *gin.Engine {
 	{
 		// 上传菜品
 		apiAdmin.POST("/uploadMenuItem", admin.UploadMenuItem)
+		// 更新菜品
+		apiAdmin.PUT("/updateMenuItem", admin.UpdateMenuItem)
 		// 删除菜品
 		apiAdmin.DELETE("/deleteMenuItem", admin.DeleteMenuItem)
 	}
