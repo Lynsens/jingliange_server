@@ -147,7 +147,7 @@ func LikeMenu(c *gin.Context) {
 	}
 
 	// 检查菜品状态
-	if existingMenu.Status == 0 {
+	if existingMenu.Status == 0 || existingMenu.IsArchived == 1 {
 		appG.Response(http.StatusNotFound, e.ERROR, "Menu item not available")
 		return
 	}
@@ -222,14 +222,18 @@ func GetMenuLikeStatus(c *gin.Context) {
 		return
 	}
 
-	// 检查菜品是否存在
-	_, err = menuRepo.GetMenuByID(statusReq.MenuID)
+	// 检查菜品是否存在且可见
+	existingMenu, err := menuRepo.GetMenuByID(statusReq.MenuID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
 		} else {
 			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		}
+		return
+	}
+	if existingMenu.Status == 0 || existingMenu.IsArchived == 1 {
+		appG.Response(http.StatusNotFound, e.ERROR, "Menu item not available")
 		return
 	}
 
@@ -310,7 +314,7 @@ func CommentMenu(c *gin.Context) {
 	}
 
 	// 检查菜品状态
-	if existingMenu.Status == 0 {
+	if existingMenu.Status == 0 || existingMenu.IsArchived == 1 {
 		appG.Response(http.StatusNotFound, e.ERROR, "Menu item not available")
 		return
 	}
@@ -370,14 +374,18 @@ func GetMenuComments(c *gin.Context) {
 		queryReq.PageNumber = 0
 	}
 
-	// 检查菜品是否存在
-	_, err = menuRepo.GetMenuByID(queryReq.MenuID)
+	// 检查菜品是否存在且可见
+	existingMenu, err := menuRepo.GetMenuByID(queryReq.MenuID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
 		} else {
 			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		}
+		return
+	}
+	if existingMenu.Status == 0 || existingMenu.IsArchived == 1 {
+		appG.Response(http.StatusNotFound, e.ERROR, "Menu item not available")
 		return
 	}
 

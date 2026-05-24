@@ -30,10 +30,69 @@ func (a *aboutDB) GetActivityList(timestamp int, pageNumber int) ([]model.Activi
 		Where("status = ? AND create_time > ?", 1, timestamp).
 		Offset(pageNumber * pageSize).
 		Limit(pageSize).
-		Order("create_time DESC").
+		Order("is_top DESC, create_time DESC").
 		Find(&m).Error
 	if err != nil {
 		return m, err
 	}
 	return m, nil
+}
+
+func (a *aboutDB) GetAdminActivityList(keyword string, pageSize int, pageNumber int) ([]model.Activity, error) {
+	if pageSize <= 0 {
+		pageSize = setting.AppSetting.PageSize
+	}
+	if pageNumber < 0 {
+		pageNumber = 0
+	}
+
+	m := []model.Activity{}
+	query := a.db.Table("activity").Where("status = ?", 1)
+	if keyword != "" {
+		like := "%" + keyword + "%"
+		query = query.Where("(title LIKE ? OR content LIKE ? OR place LIKE ?)", like, like, like)
+	}
+
+	err := query.
+		Offset(pageNumber * pageSize).
+		Limit(pageSize).
+		Order("is_top DESC, create_time DESC").
+		Find(&m).Error
+	return m, err
+}
+
+func (a *aboutDB) GetActivityByID(id uint64) (model.Activity, error) {
+	m := model.Activity{}
+	err := a.db.Table("activity").Where("id = ?", id).First(&m).Error
+	return m, err
+}
+
+func (a *aboutDB) CreateActivity(activity model.Activity) error {
+	activity.Status = 1
+	return a.db.Table("activity").Create(&activity).Error
+}
+
+func (a *aboutDB) UpdateActivity(activity model.Activity) error {
+	return a.db.Table("activity").
+		Where("id = ? AND status = ?", activity.ID, 1).
+		Updates(map[string]interface{}{
+			"title":      activity.Title,
+			"content":    activity.Content,
+			"event_time": activity.EventTime,
+			"place":      activity.Place,
+			"is_top":     activity.IsTop,
+		}).Error
+}
+
+func (a *aboutDB) DeleteActivity(id uint64) error {
+	return a.db.Table("activity").Where("id = ?", id).Updates(map[string]interface{}{
+		"status": 0,
+		"is_top": 0,
+	}).Error
+}
+
+func (a *aboutDB) SetActivityTop(id uint64, isTop int) error {
+	return a.db.Table("activity").
+		Where("id = ? AND status = ?", id, 1).
+		Update("is_top", isTop).Error
 }

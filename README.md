@@ -9,7 +9,9 @@
 - 单个菜品详情查询
 - 菜品点赞功能（支持用户点赞状态）
 - 菜品评论功能
-- 菜品上传和软删除（管理员功能）
+- 菜品上传、编辑和软删除（管理员功能）
+- 今日推荐菜品标注：同一时间最多只有一个菜品可作为今日推荐
+- 菜品下架：使用 archive 状态下架非当季菜品，区别于删除
 
 ### 💰 捐赠功德榜模块
 - 捐款记录创建（金额、昵称、留言）
@@ -27,7 +29,9 @@
 ### 🛠️ 管理员模块
 - 配置文件管理员账号
 - bcrypt 密码哈希校验
-- 菜品新增和软删除
+- 菜品新增、编辑、软删除和今日推荐标注
+- 菜品 archive 下架功能：管理员可下架非当季菜品，也可重新上架
+- 活动管理功能：管理员可新增、编辑、删除和置顶近期活动
 - 管理员接口与普通用户 JWT 隔离
 
 ### 📋 其他功能
@@ -92,7 +96,61 @@ go test ./pkg/util ./internal/router/api/admin ./internal/router
 go test ./...
 ```
 
-注意：`internal/router/api/v1` 中部分测试会连接配置里的 MySQL 测试库。如果本地没有对应数据库，完整测试会因为 `ERROR_DB` 失败。
+注意：`internal/router/api/v1` 中部分测试会连接配置里的 MySQL 测试库。如果测试库不可访问，完整测试会因为 `ERROR_DB` 失败。
+
+### 测试数据库
+测试数据库已经迁移到服务器上的独立 database：
+
+- MySQL 服务器：`49.234.22.169:3306`
+- 生产库：`jlg`
+- 测试库：`jlg_test`
+- 测试账号：`jlg_test`
+- 测试配置文件：`conf/app_test.ini`
+- 测试库账号只授予 `jlg_test.*` 权限，避免测试误写生产数据
+
+当前测试库初始化方式：
+
+```bash
+# 在服务器上创建测试库和测试账号
+sudo mysql -e "CREATE DATABASE IF NOT EXISTS jlg_test CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;"
+sudo mysql -e "CREATE USER IF NOT EXISTS 'jlg_test'@'%' IDENTIFIED BY '<test-password>';"
+sudo mysql -e "GRANT ALL PRIVILEGES ON jlg_test.* TO 'jlg_test'@'%'; FLUSH PRIVILEGES;"
+
+# 首次初始化时从生产库复制一份结构和基础数据
+sudo mysqldump --no-tablespaces jlg | sudo mysql jlg_test
+```
+
+测试库需要保留这些基础数据，避免测试依赖生产库当前内容：
+
+- `menu.id = 1`：用于菜单详情、点赞、评论测试。
+- `user.id IN ('test_user', 'test_user_2', 'test_user_123', 'wulongcha_test')`：用于功德榜和认证相关测试。
+
+可以用下面命令验证本地开发机能连接测试库：
+
+```bash
+mysql -h 49.234.22.169 -P 3306 -u jlg_test -p jlg_test \
+  -e "SELECT DATABASE(), COUNT(*) FROM menu;"
+```
+
+后续任何数据库表结构变更，都必须同时处理生产库和测试库：
+
+1. 先更新 `docs/sql/*.sql` 中的建表或变更语句。
+2. 先在测试库 `jlg_test` 执行对应 `ALTER TABLE` 或迁移语句。
+3. 跑 `go test ./...`，确认测试库结构和代码兼容。
+4. 部署前在生产库 `jlg` 执行同一份结构变更。
+5. 生产库变更后做一次公开接口和管理员接口健康检查。
+6. 在 README 或部署记录中注明已同步 `prod` 和 `test`。
+
+禁止只改生产库或只改测试库。两个库结构不一致时，测试结果会失真，线上部署也容易在 GORM 查询字段时失败。
+
+当前菜单和活动管理相关表结构变更包括：
+
+- `menu.is_recommended`：今日推荐标记，最多一个正常上架菜品为 `1`。
+- `menu.is_archived`：菜品下架标记，`1` 表示非当季/已下架。
+- `menu.archive_time`：菜品下架时间，可为空。
+- `activity.is_top`：活动置顶标记。
+- `activity.event_time`：活动时间展示文案，例如 `周六 10:30`。
+- `activity.place`：活动地点。
 
 ### 功能测试
 项目提供了功能测试脚本：
@@ -121,7 +179,16 @@ go test ./...
 ### 管理员接口
 - `POST /api/admin/login` - 管理员登录，返回管理员 JWT
 - `POST /api/admin/uploadMenuItem` - 新增菜品，需要管理员 JWT
+- `POST /api/admin/menu/list` - 管理员菜单列表，可返回已下架菜品
+- `PUT /api/admin/updateMenuItem` - 更新菜品，需要管理员 JWT
+- `PUT /api/admin/recommendMenuItem` - 设置今日推荐，需要管理员 JWT；设置时自动取消其他菜品推荐
+- `PUT /api/admin/archiveMenuItem` - 下架或重新上架菜品；下架今日推荐菜品时自动取消推荐
 - `DELETE /api/admin/deleteMenuItem` - 删除菜品，需要管理员 JWT
+- `POST /api/admin/activity/list` - 管理员活动列表
+- `POST /api/admin/activity/create` - 新增活动
+- `PUT /api/admin/activity/update` - 更新活动
+- `DELETE /api/admin/activity/delete` - 删除活动
+- `PUT /api/admin/activity/top` - 设置或取消活动置顶
 
 ### 其他接口
 - `GET /api/v1/about/getDescription` - 获取关于信息
@@ -161,6 +228,20 @@ go test ./...
 4. 添加Swagger文档注释
 5. 更新路由配置
 6. 编写单元测试
+
+### 菜单状态规则
+- `status = 1` 表示未删除，`status = 0` 表示软删除。
+- `is_archived = 0` 表示上架中，`is_archived = 1` 表示已下架/非当季。
+- 普通用户菜单接口只返回 `status = 1 AND is_archived = 0`。
+- 管理员菜单列表应返回 `status = 1` 的菜单，并支持按全部、上架中、已下架筛选。
+- 今日推荐只允许设置在 `status = 1 AND is_archived = 0` 的菜品上。
+- 下架今日推荐菜品时，后端必须自动将该菜品 `is_recommended` 设为 `0`。
+
+### 活动置顶规则
+- 首页近期活动优先展示 `is_top = 1` 的活动。
+- 活动排序建议为 `is_top DESC, create_time DESC`。
+- 活动置顶可支持多个活动，不强制单一置顶。
+- 活动删除使用软删除：`status = 0`。
 
 ### 代码规范
 - 使用有意义的变量和函数名

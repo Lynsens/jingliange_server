@@ -15,6 +15,15 @@ ADD COLUMN `name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '菜品名称' AFTER 
 ALTER TABLE `jlg`.`menu`
 ADD COLUMN `ingredients` JSON NOT NULL COMMENT '成分表，JSON 格式' AFTER `nutrition`;
 
+ALTER TABLE `jlg`.`menu`
+ADD COLUMN `is_recommended` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否今日推荐：0 否，1 是' AFTER `ingredients`;
+
+ALTER TABLE `jlg`.`menu`
+ADD COLUMN `is_archived` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否下架：0 上架，1 下架' AFTER `is_recommended`;
+
+ALTER TABLE `jlg`.`menu`
+ADD COLUMN `archive_time` DATETIME(3) NULL DEFAULT NULL COMMENT '下架时间' AFTER `is_archived`;
+
 CREATE TABLE IF NOT EXISTS `jlg`.`menu_feedback` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '流水ID,自增序列号',
   `menu_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '菜单 ID',
@@ -27,4 +36,3 @@ CREATE TABLE IF NOT EXISTS `jlg`.`menu_feedback` (
   PRIMARY KEY (`id`),
   FOREIGN KEY (`menu_id`) REFERENCES `menu`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=DYNAMIC COMMENT='菜单反馈';
-

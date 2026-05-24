@@ -3,14 +3,74 @@ package admin
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lynsens/jingliange_server/internal/model"
 	"github.com/lynsens/jingliange_server/internal/repo"
 	"github.com/lynsens/jingliange_server/pkg/app"
 	"github.com/lynsens/jingliange_server/pkg/e"
+	"github.com/lynsens/jingliange_server/pkg/setting"
 	"gorm.io/gorm"
 )
+
+func normalizeBinaryFlag(value int) int {
+	if value == 1 {
+		return 1
+	}
+	return 0
+}
+
+func validateArchiveStatus(value string) string {
+	switch value {
+	case "active", "archived":
+		return value
+	default:
+		return "all"
+	}
+}
+
+// @Summary 管理员获取菜单列表
+// @Description 管理员菜单列表，可查看上架中和已下架菜品。
+// @Tags Menu
+// @Accept json
+// @Param query body model.AdminMenuListRequest true "查询参数" schemaexample({"keyword":"","archive_status":"all","page_size":20,"page_number":0})
+// @Produce json
+// @Success 200 {object} app.Response{data=[]model.MenuWithLikes}
+// @Router /api/admin/menu/list [post]
+func GetMenuItems(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	menuRepo := repo.NewMenuDB(db)
+
+	var req model.AdminMenuListRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
+		return
+	}
+
+	if req.PageSize <= 0 {
+		req.PageSize = setting.AppSetting.PageSize
+	}
+	if req.PageNumber < 0 {
+		req.PageNumber = 0
+	}
+	req.ArchiveStatus = validateArchiveStatus(req.ArchiveStatus)
+
+	menus, err := menuRepo.GetAdminMenuList(req.PageSize, req.PageNumber, strings.TrimSpace(req.Keyword), req.ArchiveStatus)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, menus)
+}
 
 // @Summary 上传菜品
 // @Description 提供菜品的名称、图片url、简介、营养价值表、主要成分，上传到数据库。营养价值表和主要成分需要以JSON字符串格式提供。
@@ -46,6 +106,8 @@ func UploadMenuItem(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "All fields are required")
 		return
 	}
+	menuItem.IsRecommended = normalizeBinaryFlag(menuItem.IsRecommended)
+	menuItem.IsArchived = normalizeBinaryFlag(menuItem.IsArchived)
 
 	if err := repo.CreateMenu(menuItem); err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
@@ -96,6 +158,12 @@ func UpdateMenuItem(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "All fields are required")
 		return
 	}
+	menuItem.IsRecommended = normalizeBinaryFlag(menuItem.IsRecommended)
+	menuItem.IsArchived = normalizeBinaryFlag(menuItem.IsArchived)
+	if menuItem.IsArchived == 1 && menuItem.IsRecommended == 1 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Archived menu item cannot be recommended")
+		return
+	}
 
 	existingMenu, err := repo.GetMenuByID(menuItem.ID)
 	if err != nil {
@@ -117,8 +185,133 @@ func UpdateMenuItem(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		return
 	}
+	if menuItem.IsRecommended == 1 {
+		if err := repo.SetRecommendedMenu(menuItem.ID, 1); err != nil {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+			return
+		}
+	}
 
 	appG.Response(http.StatusOK, e.SUCCESS, menuItem)
+}
+
+// @Summary 设置今日推荐菜品
+// @Description 设置或取消菜品今日推荐。设置为推荐时会自动取消其它菜品的今日推荐，保证最多只有一个今日推荐菜品。
+// @Tags Menu
+// @Accept json
+// @Param recommend body model.SetMenuRecommendationRequest true "今日推荐参数" schemaexample({"id":1,"is_recommended":1})
+// @Produce json
+// @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":null}"
+// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid menu ID"}"
+// @Failure 404 {object} app.Response "{"code":404,"msg":"not found","data":"Menu item not found"}"
+// @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
+// @Router /api/admin/recommendMenuItem [put]
+func SetRecommendedMenuItem(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	menuRepo := repo.NewMenuDB(db)
+
+	var req model.SetMenuRecommendationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
+		return
+	}
+
+	if req.ID <= 0 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
+		return
+	}
+
+	if req.IsRecommended != 0 && req.IsRecommended != 1 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid recommendation value")
+		return
+	}
+
+	existingMenu, err := menuRepo.GetMenuByID(req.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
+		} else {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		}
+		return
+	}
+
+	if existingMenu.Status == 0 {
+		appG.Response(http.StatusNotFound, e.ERROR, "Menu item already deleted")
+		return
+	}
+	if existingMenu.IsArchived == 1 && req.IsRecommended == 1 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Archived menu item cannot be recommended")
+		return
+	}
+
+	if err := menuRepo.SetRecommendedMenu(req.ID, req.IsRecommended); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, nil)
+}
+
+// @Summary 下架或重新上架菜品
+// @Description 设置菜品 archive 状态。下架今日推荐菜品时会自动取消今日推荐。
+// @Tags Menu
+// @Accept json
+// @Param archive body model.ArchiveMenuRequest true "下架参数" schemaexample({"id":1,"is_archived":1})
+// @Produce json
+// @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":null}"
+// @Router /api/admin/archiveMenuItem [put]
+func ArchiveMenuItem(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	menuRepo := repo.NewMenuDB(db)
+
+	var req model.ArchiveMenuRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
+		return
+	}
+
+	if req.ID <= 0 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid menu ID")
+		return
+	}
+	req.IsArchived = normalizeBinaryFlag(req.IsArchived)
+
+	existingMenu, err := menuRepo.GetMenuByID(req.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			appG.Response(http.StatusNotFound, e.ERROR, "Menu item not found")
+		} else {
+			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		}
+		return
+	}
+
+	if existingMenu.Status == 0 {
+		appG.Response(http.StatusNotFound, e.ERROR, "Menu item already deleted")
+		return
+	}
+
+	if err := menuRepo.ArchiveMenu(req.ID, req.IsArchived); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
 
 // @Summary 删除菜品

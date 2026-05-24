@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"time"
+
 	"github.com/lynsens/jingliange_server/internal/model"
 	"gorm.io/gorm"
 )
@@ -17,14 +19,14 @@ func (m *MenuDB) GetMenuList(pageSize, pageNumber int, name string) ([]model.Men
 	var menus []model.Menu
 	offset := pageNumber * pageSize
 
-	query := m.db.Table("menu").Where("status = ?", 1) // 只查询状态为1的菜品
+	query := m.db.Table("menu").Where("status = ? AND is_archived = ?", 1, 0)
 
 	// 添加模糊查询条件 - 搜索菜品名称和描述
 	if name != "" {
 		query = query.Where("(name LIKE ? OR `desc` LIKE ?)", "%"+name+"%", "%"+name+"%")
 	}
 
-	err := query.Offset(offset).Limit(pageSize).Find(&menus).Error
+	err := query.Order("is_recommended DESC, id ASC").Offset(offset).Limit(pageSize).Find(&menus).Error
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +51,7 @@ func (m *MenuDB) GetMenuList(pageSize, pageNumber int, name string) ([]model.Men
 
 func (m *MenuDB) GetMenuCount(name string) (int64, error) {
 	var count int64
-	query := m.db.Table("menu").Where("status = ?", 1) // 只统计状态为1的菜品
+	query := m.db.Table("menu").Where("status = ? AND is_archived = ?", 1, 0)
 
 	// 添加模糊查询条件 - 搜索菜品名称和描述
 	if name != "" {
@@ -61,6 +63,48 @@ func (m *MenuDB) GetMenuCount(name string) (int64, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+func (m *MenuDB) GetAdminMenuList(pageSize, pageNumber int, keyword string, archiveStatus string) ([]model.MenuWithLikes, error) {
+	var menus []model.Menu
+	offset := pageNumber * pageSize
+
+	query := m.db.Table("menu").Where("status = ?", 1)
+	switch archiveStatus {
+	case "active":
+		query = query.Where("is_archived = ?", 0)
+	case "archived":
+		query = query.Where("is_archived = ?", 1)
+	}
+
+	if keyword != "" {
+		like := "%" + keyword + "%"
+		query = query.Where("(CAST(id AS CHAR) = ? OR name LIKE ? OR `desc` LIKE ?)", keyword, like, like)
+	}
+
+	err := query.
+		Order("is_archived ASC, is_recommended DESC, id DESC").
+		Offset(offset).
+		Limit(pageSize).
+		Find(&menus).Error
+	if err != nil {
+		return nil, err
+	}
+
+	menusWithLikes := make([]model.MenuWithLikes, 0, len(menus))
+	for _, menu := range menus {
+		likeCount, err := m.GetMenuLikeCount(menu.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		menusWithLikes = append(menusWithLikes, model.MenuWithLikes{
+			Menu:      menu,
+			LikeCount: likeCount,
+		})
+	}
+
+	return menusWithLikes, nil
 }
 
 func (m *MenuDB) GetMenuByID(id int) (model.Menu, error) {
@@ -85,30 +129,114 @@ func (m *MenuDB) CreateMenu(menu model.Menu) error {
 		return err
 	}
 
-	// 确保新创建的菜品状态为1（正常）
-	menu.Status = 1
-	err = m.db.Table("menu").Create(&menu).Error // 不使用 Table("menu")，直接使用模型
-	if err != nil {
-		return err
-	}
-	return nil
+	return m.db.Transaction(func(tx *gorm.DB) error {
+		// 确保新创建的菜品状态为1（正常）
+		menu.Status = 1
+		if menu.IsArchived == 1 {
+			menu.IsRecommended = 0
+			now := time.Now()
+			menu.ArchiveTime = &now
+		}
+		if err := tx.Table("menu").Create(&menu).Error; err != nil {
+			return err
+		}
+
+		if menu.IsRecommended == 1 {
+			if err := tx.Table("menu").
+				Where("id <> ? AND status = ? AND is_archived = ?", menu.ID, 1, 0).
+				Update("is_recommended", 0).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 }
 
 func (m *MenuDB) UpdateMenu(menu model.Menu) error {
-	err := m.db.Table("menu").Where("id = ?", menu.ID).Updates(menu).Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return m.db.Transaction(func(tx *gorm.DB) error {
+		isRecommended := menu.IsRecommended
+		if menu.IsArchived == 1 {
+			isRecommended = 0
+		}
+
+		updates := map[string]interface{}{
+			"name":           menu.Name,
+			"image_url":      menu.Image_url,
+			"desc":           menu.Desc,
+			"nutrition":      menu.Nutrition,
+			"ingredients":    menu.Ingredients,
+			"is_recommended": isRecommended,
+			"is_archived":    menu.IsArchived,
+			"status":         menu.Status,
+		}
+
+		if menu.IsArchived == 1 {
+			now := time.Now()
+			updates["archive_time"] = now
+		} else {
+			updates["archive_time"] = nil
+		}
+
+		if err := tx.Table("menu").Where("id = ?", menu.ID).Updates(updates).Error; err != nil {
+			return err
+		}
+
+		if isRecommended == 1 {
+			return tx.Table("menu").
+				Where("id <> ? AND status = ? AND is_archived = ?", menu.ID, 1, 0).
+				Update("is_recommended", 0).Error
+		}
+
+		return nil
+	})
 }
 
 func (m *MenuDB) DeleteMenu(id int) error {
 	// 软删除：将状态标记为0（删除状态）而不是真正删除记录
-	err := m.db.Table("menu").Where("id = ?", id).Update("status", 0).Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return m.db.Table("menu").Where("id = ?", id).Updates(map[string]interface{}{
+		"status":         0,
+		"is_recommended": 0,
+	}).Error
+}
+
+func (m *MenuDB) SetRecommendedMenu(id int, isRecommended int) error {
+	return m.db.Transaction(func(tx *gorm.DB) error {
+		if isRecommended == 1 {
+			if err := tx.Table("menu").
+				Where("status = ? AND is_archived = ?", 1, 0).
+				Update("is_recommended", 0).Error; err != nil {
+				return err
+			}
+
+			return tx.Table("menu").
+				Where("id = ? AND status = ? AND is_archived = ?", id, 1, 0).
+				Update("is_recommended", 1).Error
+		}
+
+		return tx.Table("menu").
+			Where("id = ? AND status = ?", id, 1).
+			Update("is_recommended", 0).Error
+	})
+}
+
+func (m *MenuDB) ArchiveMenu(id int, isArchived int) error {
+	return m.db.Transaction(func(tx *gorm.DB) error {
+		updates := map[string]interface{}{
+			"is_archived": isArchived,
+		}
+
+		if isArchived == 1 {
+			updates["is_recommended"] = 0
+			updates["archive_time"] = time.Now()
+		} else {
+			updates["archive_time"] = nil
+		}
+
+		return tx.Table("menu").
+			Where("id = ? AND status = ?", id, 1).
+			Updates(updates).Error
+	})
 }
 
 func (m *MenuDB) LikeMenu(menuID int, userID string) error {
@@ -211,7 +339,7 @@ func (m *MenuDB) GetMenuCommentCount(menuID int) (int64, error) {
 
 func (m *MenuDB) GetMenuByIDWithLikes(id int) (model.MenuWithLikes, error) {
 	var menu model.Menu
-	err := m.db.Table("menu").Where("id = ? AND status = ?", id, 1).First(&menu).Error
+	err := m.db.Table("menu").Where("id = ? AND status = ? AND is_archived = ?", id, 1, 0).First(&menu).Error
 	if err != nil {
 		return model.MenuWithLikes{}, err
 	}
@@ -235,14 +363,14 @@ func (m *MenuDB) GetMenuListWithUserLikes(pageSize, pageNumber int, name string,
 	var menus []model.Menu
 	offset := pageNumber * pageSize
 
-	query := m.db.Table("menu").Where("status = ?", 1) // 只查询状态为1的菜品
+	query := m.db.Table("menu").Where("status = ? AND is_archived = ?", 1, 0)
 
 	// 添加模糊查询条件 - 搜索菜品名称和描述
 	if name != "" {
 		query = query.Where("(name LIKE ? OR `desc` LIKE ?)", "%"+name+"%", "%"+name+"%")
 	}
 
-	err := query.Offset(offset).Limit(pageSize).Find(&menus).Error
+	err := query.Order("is_recommended DESC, id ASC").Offset(offset).Limit(pageSize).Find(&menus).Error
 	if err != nil {
 		return nil, err
 	}

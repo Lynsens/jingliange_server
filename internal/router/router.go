@@ -82,12 +82,24 @@ func InitRouter() *gin.Engine {
 	apiAdmin.POST("/login", admin.Login)
 	apiAdmin.Use(util.AdminJWT())
 	{
+		// 管理员菜单列表
+		apiAdmin.POST("/menu/list", admin.GetMenuItems)
 		// 上传菜品
 		apiAdmin.POST("/uploadMenuItem", admin.UploadMenuItem)
 		// 更新菜品
 		apiAdmin.PUT("/updateMenuItem", admin.UpdateMenuItem)
+		// 设置今日推荐菜品
+		apiAdmin.PUT("/recommendMenuItem", admin.SetRecommendedMenuItem)
+		// 下架或重新上架菜品
+		apiAdmin.PUT("/archiveMenuItem", admin.ArchiveMenuItem)
 		// 删除菜品
 		apiAdmin.DELETE("/deleteMenuItem", admin.DeleteMenuItem)
+		// 活动管理
+		apiAdmin.POST("/activity/list", admin.GetActivityList)
+		apiAdmin.POST("/activity/create", admin.CreateActivity)
+		apiAdmin.PUT("/activity/update", admin.UpdateActivity)
+		apiAdmin.DELETE("/activity/delete", admin.DeleteActivity)
+		apiAdmin.PUT("/activity/top", admin.SetActivityTop)
 	}
 
 	return r

@@ -172,6 +172,11 @@ func CreateDonation(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Donor name must be 1-10 characters")
 		return
 	}
+	if utf8.RuneCountInString(createReq.Message) > 60 {
+		logging.Error("CreateDonation - 参数验证失败: message过长")
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Message must not exceed 60 characters")
+		return
+	}
 
 	// 创建捐款记录
 	donation := model.Donation{
@@ -284,6 +289,11 @@ func AuthUser(c *gin.Context) {
 	if authReq.UserID == "" {
 		logging.Error("AuthUser - 参数验证失败: user_id为空")
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User ID is required")
+		return
+	}
+	if utf8.RuneCountInString(authReq.UserID) > 64 {
+		logging.Error("AuthUser - 参数验证失败: user_id过长")
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User ID must not exceed 64 characters")
 		return
 	}
 

@@ -19,6 +19,15 @@ CREATE TABLE IF NOT EXISTS `jlg`.`activity` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=DYNAMIC COMMENT='活动表';
 
+ALTER TABLE `jlg`.`activity`
+ADD COLUMN `event_time` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '活动时间展示文案' AFTER `content`;
+
+ALTER TABLE `jlg`.`activity`
+ADD COLUMN `place` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '活动地点' AFTER `event_time`;
+
+ALTER TABLE `jlg`.`activity`
+ADD COLUMN `is_top` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否置顶：0 否，1 是' AFTER `img`;
+
 
 CREATE TABLE IF NOT EXISTS `jlg`.`images` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '流水ID,自增序列号',
