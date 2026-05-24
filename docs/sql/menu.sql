@@ -36,3 +36,12 @@ CREATE TABLE IF NOT EXISTS `jlg`.`menu_feedback` (
   PRIMARY KEY (`id`),
   FOREIGN KEY (`menu_id`) REFERENCES `menu`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=DYNAMIC COMMENT='菜单反馈';
+
+ALTER TABLE `jlg`.`menu_feedback`
+ADD COLUMN `user_nickname` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '评论展示昵称' AFTER `user_id`;
+
+ALTER TABLE `jlg`.`menu_feedback`
+ADD COLUMN `user_avatar_url` VARCHAR(256) NOT NULL DEFAULT '' COMMENT '评论展示头像 URL' AFTER `user_nickname`;
+
+ALTER TABLE `jlg`.`menu_feedback`
+ADD UNIQUE KEY `uk_menu_feedback_menu_user` (`menu_id`, `user_id`);

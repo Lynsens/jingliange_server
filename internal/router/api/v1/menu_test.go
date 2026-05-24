@@ -220,8 +220,10 @@ func TestCommentMenu(t *testing.T) {
 		{
 			name: "valid comment request",
 			requestBody: model.MenuCommentRequest{
-				MenuID:  1,
-				Comment: "这道菜很好吃！",
+				MenuID:        1,
+				Comment:       "这道菜很好吃！",
+				UserNickname:  "测试莲友",
+				UserAvatarURL: "/uploads/images/test-avatar.jpg",
 			},
 			userID:       "test_user",
 			expectedCode: http.StatusOK,

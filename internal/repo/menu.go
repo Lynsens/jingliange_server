@@ -289,23 +289,29 @@ func (m *MenuDB) GetMenuLikeCount(menuID int) (int64, error) {
 	return count, err
 }
 
-func (m *MenuDB) CommentMenu(menuID int, userID string, comment string) error {
+func (m *MenuDB) CommentMenu(menuID int, userID string, comment string, userNickname string, userAvatarURL string) error {
 	// 检查用户是否已经对该菜品有反馈
 	var existingFeedback model.MenuFeedback
 	err := m.db.Table("menu_feedback").Where("menu_id = ? AND user_id = ? AND status = ?", menuID, userID, 1).First(&existingFeedback).Error
 
 	if err == nil {
 		// 如果已存在反馈，更新评论
-		err = m.db.Table("menu_feedback").Where("id = ?", existingFeedback.ID).Update("comment", comment).Error
+		err = m.db.Table("menu_feedback").Where("id = ?", existingFeedback.ID).Updates(map[string]interface{}{
+			"comment":         comment,
+			"user_nickname":   userNickname,
+			"user_avatar_url": userAvatarURL,
+		}).Error
 		return err
 	} else if err == gorm.ErrRecordNotFound {
 		// 如果不存在反馈，创建新的评论记录
 		feedback := model.MenuFeedback{
-			MenuID:     int(menuID),
-			UserID:     userID,
-			Preference: 0, // 0 表示默认状态
-			Comment:    comment,
-			Status:     1, // 1 表示正常状态
+			MenuID:        int(menuID),
+			UserID:        userID,
+			UserNickname:  userNickname,
+			UserAvatarURL: userAvatarURL,
+			Preference:    0, // 0 表示默认状态
+			Comment:       comment,
+			Status:        1, // 1 表示正常状态
 		}
 		err = m.db.Table("menu_feedback").Create(&feedback).Error
 		return err
@@ -335,6 +341,34 @@ func (m *MenuDB) GetMenuCommentCount(menuID int) (int64, error) {
 		Where("menu_id = ? AND status = ? AND comment != ?", menuID, 1, "").
 		Count(&count).Error
 	return count, err
+}
+
+func (m *MenuDB) GetAdminCommentList(pageSize, pageNumber int, keyword string) ([]model.AdminCommentItem, error) {
+	var comments []model.AdminCommentItem
+	offset := pageNumber * pageSize
+
+	query := m.db.Table("menu_feedback AS f").
+		Select("f.id, f.menu_id, COALESCE(m.name, '') AS menu_name, f.user_id, f.user_nickname, f.user_avatar_url, f.comment, f.preference, f.create_time, f.update_time").
+		Joins("LEFT JOIN menu AS m ON m.id = f.menu_id").
+		Where("f.status = ? AND f.comment != ?", 1, "")
+
+	if keyword != "" {
+		like := "%" + keyword + "%"
+		query = query.Where("(CAST(f.id AS CHAR) = ? OR CAST(f.menu_id AS CHAR) = ? OR f.user_id LIKE ? OR f.user_nickname LIKE ? OR f.comment LIKE ? OR m.name LIKE ?)", keyword, keyword, like, like, like, like)
+	}
+
+	err := query.
+		Order("f.update_time DESC").
+		Offset(offset).
+		Limit(pageSize).
+		Scan(&comments).Error
+	return comments, err
+}
+
+func (m *MenuDB) ClearMenuComment(id int) error {
+	return m.db.Table("menu_feedback").
+		Where("id = ? AND status = ?", id, 1).
+		Update("comment", "").Error
 }
 
 func (m *MenuDB) GetMenuByIDWithLikes(id int) (model.MenuWithLikes, error) {

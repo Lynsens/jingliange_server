@@ -12,6 +12,7 @@
 - 菜品上传、编辑和软删除（管理员功能）
 - 今日推荐菜品标注：同一时间最多只有一个菜品可作为今日推荐
 - 菜品下架：使用 archive 状态下架非当季菜品，区别于删除
+- 评论展示微信昵称和头像；同一用户对同一菜品的点赞和评论共用一条反馈记录，避免重复点赞/重复评论
 
 ### 💰 捐赠功德榜模块
 - 捐款记录创建（金额、昵称、留言）
@@ -32,6 +33,7 @@
 - 菜品新增、编辑、软删除和今日推荐标注
 - 菜品 archive 下架功能：管理员可下架非当季菜品，也可重新上架
 - 活动管理功能：管理员可新增、编辑、删除和置顶近期活动
+- 评论管理功能：管理员可查看、搜索和删除用户评论；删除评论不会影响点赞状态
 - 管理员接口与普通用户 JWT 隔离
 
 ### 📋 其他功能
@@ -148,6 +150,9 @@ mysql -h 49.234.22.169 -P 3306 -u jlg_test -p jlg_test \
 - `menu.is_recommended`：今日推荐标记，最多一个正常上架菜品为 `1`。
 - `menu.is_archived`：菜品下架标记，`1` 表示非当季/已下架。
 - `menu.archive_time`：菜品下架时间，可为空。
+- `menu_feedback.user_nickname`：评论展示昵称。
+- `menu_feedback.user_avatar_url`：评论展示头像 URL。
+- `menu_feedback.uk_menu_feedback_menu_user`：`menu_id + user_id` 唯一索引，用于保证同一用户对同一菜品只有一条反馈记录。
 - `activity.is_top`：活动置顶标记。
 - `activity.event_time`：活动时间展示文案，例如 `周六 10:30`。
 - `activity.place`：活动地点。
@@ -180,6 +185,8 @@ mysql -h 49.234.22.169 -P 3306 -u jlg_test -p jlg_test \
 - `POST /api/admin/login` - 管理员登录，返回管理员 JWT
 - `POST /api/admin/uploadMenuItem` - 新增菜品，需要管理员 JWT
 - `POST /api/admin/menu/list` - 管理员菜单列表，可返回已下架菜品
+- `POST /api/admin/comment/list` - 管理员评论列表，可按评论、用户、菜品和 ID 搜索
+- `DELETE /api/admin/comment/delete` - 删除评论内容，不影响用户点赞状态
 - `PUT /api/admin/updateMenuItem` - 更新菜品，需要管理员 JWT
 - `PUT /api/admin/recommendMenuItem` - 设置今日推荐，需要管理员 JWT；设置时自动取消其他菜品推荐
 - `PUT /api/admin/archiveMenuItem` - 下架或重新上架菜品；下架今日推荐菜品时自动取消推荐

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lynsens/jingliange_server/internal/model"
@@ -301,6 +303,29 @@ func CommentMenu(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Comment content is required")
 		return
 	}
+	commentReq.Comment = strings.TrimSpace(commentReq.Comment)
+	commentReq.UserNickname = strings.TrimSpace(commentReq.UserNickname)
+	commentReq.UserAvatarURL = strings.TrimSpace(commentReq.UserAvatarURL)
+	if commentReq.Comment == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Comment content is required")
+		return
+	}
+	if commentReq.UserNickname == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User nickname is required")
+		return
+	}
+	if commentReq.UserAvatarURL == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User avatar is required")
+		return
+	}
+	if utf8.RuneCountInString(commentReq.UserNickname) > 64 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User nickname must not exceed 64 characters")
+		return
+	}
+	if len(commentReq.UserAvatarURL) > 256 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "User avatar URL must not exceed 256 characters")
+		return
+	}
 
 	// 检查菜品是否存在且状态正常
 	existingMenu, err := menuRepo.GetMenuByID(commentReq.MenuID)
@@ -320,7 +345,7 @@ func CommentMenu(c *gin.Context) {
 	}
 
 	// 添加评论
-	if err := menuRepo.CommentMenu(commentReq.MenuID, userID.(string), commentReq.Comment); err != nil {
+	if err := menuRepo.CommentMenu(commentReq.MenuID, userID.(string), commentReq.Comment, commentReq.UserNickname, commentReq.UserAvatarURL); err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
 		return
 	}
@@ -356,9 +381,6 @@ func GetMenuComments(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, fmt.Sprintf("Invalid input data: %v", err))
 		return
 	}
-
-	// Debug: 打印接收到的参数
-	fmt.Printf("Received MenuCommentsQueryRequest: %+v\n", queryReq)
 
 	// 验证参数
 	if queryReq.MenuID <= 0 {

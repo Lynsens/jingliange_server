@@ -84,6 +84,10 @@ func InitRouter() *gin.Engine {
 	{
 		// 管理员菜单列表
 		apiAdmin.POST("/menu/list", admin.GetMenuItems)
+		// 管理员评论列表
+		apiAdmin.POST("/comment/list", admin.GetComments)
+		// 管理员删除评论
+		apiAdmin.DELETE("/comment/delete", admin.DeleteComment)
 		// 上传菜品
 		apiAdmin.POST("/uploadMenuItem", admin.UploadMenuItem)
 		// 更新菜品

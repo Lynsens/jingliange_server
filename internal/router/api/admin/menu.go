@@ -72,14 +72,93 @@ func GetMenuItems(c *gin.Context) {
 	appG.Response(http.StatusOK, e.SUCCESS, menus)
 }
 
+// @Summary 管理员获取评论列表
+// @Description 管理员评论列表，可按评论内容、用户 ID、菜品名称或 ID 搜索。
+// @Tags Menu
+// @Accept json
+// @Param query body model.AdminCommentListRequest true "查询参数" schemaexample({"keyword":"","page_size":20,"page_number":0})
+// @Produce json
+// @Success 200 {object} app.Response{data=[]model.AdminCommentItem}
+// @Router /api/admin/comment/list [post]
+func GetComments(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	menuRepo := repo.NewMenuDB(db)
+
+	var req model.AdminCommentListRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
+		return
+	}
+
+	if req.PageSize <= 0 {
+		req.PageSize = setting.AppSetting.PageSize
+	}
+	if req.PageNumber < 0 {
+		req.PageNumber = 0
+	}
+
+	comments, err := menuRepo.GetAdminCommentList(req.PageSize, req.PageNumber, strings.TrimSpace(req.Keyword))
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, comments)
+}
+
+// @Summary 管理员删除评论
+// @Description 管理员删除评论仅清空评论内容，不影响用户点赞状态。
+// @Tags Menu
+// @Accept json
+// @Param delete body model.DeleteCommentRequest true "删除参数" schemaexample({"id":1})
+// @Produce json
+// @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":null}"
+// @Router /api/admin/comment/delete [delete]
+func DeleteComment(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	db, err := repo.ConnectDb()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
+		return
+	}
+
+	menuRepo := repo.NewMenuDB(db)
+
+	var req model.DeleteCommentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
+		return
+	}
+
+	if req.ID <= 0 {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid comment ID")
+		return
+	}
+
+	if err := menuRepo.ClearMenuComment(req.ID); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, nil)
+}
+
 // @Summary 上传菜品
-// @Description 提供菜品的名称、图片url、简介、营养价值表、主要成分，上传到数据库。营养价值表和主要成分需要以JSON字符串格式提供。
+// @Description 提供菜品的名称和简介，图片url、营养价值表、主要成分可选。营养价值表和主要成分需要以JSON字符串格式提供。
 // @Tags Menu
 // @Accept json
 // @Param menu body model.Menu true "菜品信息" schemaexample({"name":"豆腐汤","image_url":"/images/tofusoup.jpg","desc":"清淡营养的素食汤品，豆腐嫩滑，口感清香，富含植物蛋白","nutrition":"{\"calories\":\"120kcal\",\"protein\":\"12g\",\"carbs\":\"8g\",\"fat\":\"6g\",\"fiber\":\"2g\",\"sodium\":\"600mg\"}","ingredients":"{\"tofu\":\"200g\",\"seaweed\":\"20g\",\"green_onion\":\"10g\",\"mushroom\":\"50g\",\"soy_sauce\":\"10ml\",\"sesame_oil\":\"5ml\",\"salt\":\"3g\",\"white_pepper\":\"1g\",\"vegetable_broth\":\"400ml\"}"})
 // @Produce  json
 // @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":{"id":1,"name":"豆腐汤","image_url":"/images/tofusoup.jpg","desc":"清淡营养的素食汤品，豆腐嫩滑，口感清香，富含植物蛋白","nutrition":"...","ingredients":"...","status":1}}"
-// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"All fields are required"}"
+// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Name and description are required"}"
 // @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
 // @Router /api/admin/uploadMenuItem [post]
 func UploadMenuItem(c *gin.Context) {
@@ -102,8 +181,8 @@ func UploadMenuItem(c *gin.Context) {
 		return
 	}
 
-	if menuItem.Name == "" || menuItem.Image_url == "" || menuItem.Desc == "" || menuItem.Nutrition == "" || menuItem.Ingredients == "" {
-		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "All fields are required")
+	if menuItem.Name == "" || menuItem.Desc == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Name and description are required")
 		return
 	}
 	menuItem.IsRecommended = normalizeBinaryFlag(menuItem.IsRecommended)
@@ -122,13 +201,13 @@ func UploadMenuItem(c *gin.Context) {
 }
 
 // @Summary 更新菜品
-// @Description 根据菜品ID更新名称、图片url、简介、营养价值表和主要成分。营养价值表和主要成分需要以JSON字符串格式提供。
+// @Description 根据菜品ID更新名称、简介、图片url、营养价值表和主要成分。图片url、营养价值表和主要成分可选，营养价值表和主要成分需要以JSON字符串格式提供。
 // @Tags Menu
 // @Accept json
 // @Param menu body model.Menu true "菜品信息"
 // @Produce json
 // @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":{"id":1,"name":"豆腐汤","image_url":"/images/tofusoup.jpg","desc":"清淡营养的素食汤品","nutrition":"...","ingredients":"...","status":1}}"
-// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"All fields are required"}"
+// @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Name and description are required"}"
 // @Failure 404 {object} app.Response "{"code":500,"msg":"fail","data":"Menu item not found"}"
 // @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
 // @Router /api/admin/updateMenuItem [put]
@@ -154,8 +233,8 @@ func UpdateMenuItem(c *gin.Context) {
 		return
 	}
 
-	if menuItem.Name == "" || menuItem.Image_url == "" || menuItem.Desc == "" || menuItem.Nutrition == "" || menuItem.Ingredients == "" {
-		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "All fields are required")
+	if menuItem.Name == "" || menuItem.Desc == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Name and description are required")
 		return
 	}
 	menuItem.IsRecommended = normalizeBinaryFlag(menuItem.IsRecommended)

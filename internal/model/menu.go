@@ -18,14 +18,30 @@ type Menu struct {
 }
 
 type MenuFeedback struct {
-	ID         int       `json:"id" gorm:"primaryKey;autoIncrement" example:"1"`
-	MenuID     int       `json:"menu_id" gorm:"type:bigint(20) unsigned;not null;default:0" example:"1"` // 菜单 ID
-	UserID     string    `json:"user_id" gorm:"type:varchar(64);not null;default:''" example:"user123"`  // 用户	 ID
-	Preference uint      `json:"preference" gorm:"type:int unsigned;not null;default:0" example:"1"`     // 状态：0 默认，1 喜欢，2 不喜欢
-	Comment    string    `json:"comment" gorm:"type:varchar(128);not null;default:''" example:"非常好吃"`
-	Status     uint      `json:"status" gorm:"type:int unsigned;not null;default:0" example:"1"`                                                   // 状态：0 删除，1 正常
-	CreateTime time.Time `json:"create_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"` // Creation time
-	UpdateTime time.Time `json:"update_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"` // Update time
+	ID            int       `json:"id" gorm:"primaryKey;autoIncrement" example:"1"`
+	MenuID        int       `json:"menu_id" gorm:"type:bigint(20) unsigned;not null;default:0" example:"1"` // 菜单 ID
+	UserID        string    `json:"user_id" gorm:"type:varchar(64);not null;default:''" example:"user123"`  // 用户 ID
+	UserNickname  string    `json:"user_nickname" gorm:"type:varchar(64);not null;default:''" example:"莲友"`
+	UserAvatarURL string    `json:"user_avatar_url" gorm:"type:varchar(256);not null;default:''" example:"/uploads/images/avatar.jpg"`
+	Preference    uint      `json:"preference" gorm:"type:int unsigned;not null;default:0" example:"1"` // 状态：0 默认，1 喜欢，2 不喜欢
+	Comment       string    `json:"comment" gorm:"type:varchar(128);not null;default:''" example:"非常好吃"`
+	Status        uint      `json:"status" gorm:"type:int unsigned;not null;default:0" example:"1"`                                                   // 状态：0 删除，1 正常
+	CreateTime    time.Time `json:"create_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"` // Creation time
+	UpdateTime    time.Time `json:"update_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"` // Update time
+}
+
+// AdminCommentItem 管理员评论列表项
+type AdminCommentItem struct {
+	ID            int       `json:"id"`
+	MenuID        int       `json:"menu_id"`
+	MenuName      string    `json:"menu_name"`
+	UserID        string    `json:"user_id"`
+	UserNickname  string    `json:"user_nickname"`
+	UserAvatarURL string    `json:"user_avatar_url"`
+	Comment       string    `json:"comment"`
+	Preference    uint      `json:"preference"`
+	CreateTime    time.Time `json:"create_time"`
+	UpdateTime    time.Time `json:"update_time"`
 }
 
 // MenuQueryRequest 菜单查询请求结构体
@@ -41,6 +57,13 @@ type AdminMenuListRequest struct {
 	ArchiveStatus string `json:"archive_status" example:"all"` // all, active, archived
 	PageSize      int    `json:"page_size" example:"20"`       // 每页数量
 	PageNumber    int    `json:"page_number" example:"0"`      // 页码，从零开始
+}
+
+// AdminCommentListRequest 管理员评论查询请求结构体
+type AdminCommentListRequest struct {
+	Keyword    string `json:"keyword" example:"好吃"`    // 评论、用户 ID、菜品名称或 ID
+	PageSize   int    `json:"page_size" example:"20"`  // 每页数量
+	PageNumber int    `json:"page_number" example:"0"` // 页码，从零开始
 }
 
 // DeleteMenuRequest 删除菜单请求结构体
@@ -60,6 +83,11 @@ type ArchiveMenuRequest struct {
 	IsArchived int `json:"is_archived" example:"1"` // 是否下架：0 上架，1 下架
 }
 
+// DeleteCommentRequest 删除评论请求结构体
+type DeleteCommentRequest struct {
+	ID int `json:"id" example:"1"` // 评论反馈 ID
+}
+
 // MenuLikeRequest 菜品点赞请求结构体（用户ID从JWT token中获取）
 type MenuLikeRequest struct {
 	MenuID int `json:"menu_id" example:"1"` // 菜品ID
@@ -67,8 +95,10 @@ type MenuLikeRequest struct {
 
 // MenuCommentRequest 菜品评论请求结构体（用户ID从JWT token中获取）
 type MenuCommentRequest struct {
-	MenuID  int    `json:"menu_id" example:"1"`        // 菜品ID
-	Comment string `json:"comment" example:"非常好吃的菜品！"` // 评论内容
+	MenuID        int    `json:"menu_id" example:"1"`        // 菜品ID
+	Comment       string `json:"comment" example:"非常好吃的菜品！"` // 评论内容
+	UserNickname  string `json:"user_nickname" example:"莲友"` // 评论展示昵称
+	UserAvatarURL string `json:"user_avatar_url" example:"/uploads/images/avatar.jpg"`
 }
 
 // MenuCommentsQueryRequest 获取菜品评论请求结构体
