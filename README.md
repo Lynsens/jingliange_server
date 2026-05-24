@@ -70,11 +70,11 @@ go mod download
 - `[app]`：配置 `JwtSecret`、`JwtExpire`、端口和运行时目录。
 - `[admin]`：配置管理员用户名和 bcrypt 密码哈希。
 
-本地默认管理员账号：
+管理员账号：
 - 用户名：`admin`
-- 密码：`jingliange-admin`
+- 密码：不写入代码或文档；通过 `[admin].PasswordHash` 配置 bcrypt 哈希。
 
-生产环境上线前必须替换默认管理员密码哈希。
+生产环境上线前必须使用单独的管理员密码哈希，禁止提交明文密码。
 
 ### 4. 运行服务
 ```bash
@@ -308,7 +308,7 @@ GOOS=linux GOARCH=amd64 go build -o bin/jingliange_server cmd/main.go
 curl https://jingliange.com/api/v1/about/getDescription
 curl -X POST https://jingliange.com/api/admin/login \
   -H 'Content-Type: application/json' \
-  -d '{"username":"admin","password":"jingliange-admin"}'
+  -d '{"username":"admin","password":"<admin-password>"}'
 ```
 
 ## 许可证

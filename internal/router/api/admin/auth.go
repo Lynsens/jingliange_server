@@ -17,7 +17,7 @@ import (
 // @Description 使用配置文件中的管理员账号登录，返回管理员JWT token
 // @Tags Admin
 // @Accept json
-// @Param auth body model.AdminLoginRequest true "管理员登录参数" schemaexample({"username":"admin","password":"jingliange-admin"})
+// @Param auth body model.AdminLoginRequest true "管理员登录参数" schemaexample({"username":"admin","password":"<admin-password>"})
 // @Produce json
 // @Success 200 {object} app.Response{data=map[string]interface{}} "{"code":200,"msg":"ok","data":{"token":"...","username":"admin","role":"admin"}}"
 // @Failure 400 {object} app.Response "{"code":400,"msg":"请求参数错误","data":"Username and password are required"}"
