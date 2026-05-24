@@ -230,6 +230,7 @@ mysql -h 49.234.22.169 -P 3306 -u jlg_test -p jlg_test \
 │   ├── setting/           # 配置管理
 │   └── util/              # 通用工具
 ├── docs/                  # Swagger文档
+├── website/               # jingliange.com 静态首页源文件
 ├── conf/                  # 配置模板；真实 app.ini/app_test.ini 本地保存
 ├── runtime/               # 运行时文件；日志和上传文件不进入版本控制
 │   ├── logs/              # 日志文件
@@ -260,6 +261,20 @@ mysql -h 49.234.22.169 -P 3306 -u jlg_test -p jlg_test \
 - 活动排序建议为 `is_top DESC, create_time DESC`。
 - 活动置顶可支持多个活动，不强制单一置顶。
 - 活动删除使用软删除：`status = 0`。
+
+### 官网静态页
+- `website/index.html` 是 `https://jingliange.com` 的静态首页源文件。
+- 服务器部署路径是 `/var/www/jingliange.com/index.html`。
+- 更新线上文件前先备份当前 HTML，例如：
+
+```bash
+TS=$(date +%Y%m%d%H%M%S)
+sudo cp /var/www/jingliange.com/index.html /var/www/jingliange.com/index.html.bak.$TS
+sudo install -m 0644 -o root -g root website/index.html /var/www/jingliange.com/index.html
+sudo nginx -t
+```
+
+- 当前只展示工信部 ICP 备案号；没有公安备案号时不要添加公安备案占位或虚假编号。
 
 ### 代码规范
 - 使用有意义的变量和函数名
