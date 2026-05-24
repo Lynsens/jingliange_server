@@ -3,6 +3,15 @@
 #
 
 GoodScript.md
+.DS_Store
+
+# Local runtime data
+runtime/
+
+# Local configuration with secrets
+conf/app.ini
+conf/app_test.ini
+
 # Binaries for programs and plugins
 *.exe
 *.exe~

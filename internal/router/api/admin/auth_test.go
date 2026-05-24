@@ -16,7 +16,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testAdminPasswordHash = "$2a$10$7axX5Iz9EJlEAaNQ9Dz9j.RACz3ZAaARgHr3EX1R22rRyNR2SDAti"
+const (
+	testAdminPassword     = "test-admin-password"
+	testAdminPasswordHash = "$2a$10$55WFloXuVYV5gQkQ9Hd5g.C3rPjZtZiCA3NHoVSJAsoo4OS3.lMEu"
+)
 
 func setupAdminLoginTest(t *testing.T) {
 	t.Helper()
@@ -66,7 +69,7 @@ func TestAdminLogin(t *testing.T) {
 
 	statusCode, response := performAdminLogin(t, model.AdminLoginRequest{
 		Username: "admin",
-		Password: "jlg34465",
+		Password: testAdminPassword,
 	})
 
 	assert.Equal(t, http.StatusOK, statusCode)
@@ -99,7 +102,7 @@ func TestAdminLoginInvalidCredentials(t *testing.T) {
 			name: "wrong username",
 			body: model.AdminLoginRequest{
 				Username: "other",
-				Password: "jlg34465",
+				Password: testAdminPassword,
 			},
 		},
 		{
@@ -132,7 +135,7 @@ func TestAdminLoginMissingFields(t *testing.T) {
 		{
 			name: "missing username",
 			body: model.AdminLoginRequest{
-				Password: "jlg34465",
+				Password: testAdminPassword,
 			},
 		},
 		{

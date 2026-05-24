@@ -65,6 +65,13 @@ go mod download
 ```
 
 ### 3. 配置服务
+复制配置模板后编辑本地配置：
+
+```bash
+cp conf/app.example.ini conf/app.ini
+cp conf/app_test.example.ini conf/app_test.ini
+```
+
 编辑 `conf/app.ini`：
 - `[database]`：配置 MySQL 连接信息。
 - `[app]`：配置 `JwtSecret`、`JwtExpire`、端口和运行时目录。
@@ -75,6 +82,8 @@ go mod download
 - 密码：不写入代码或文档；通过 `[admin].PasswordHash` 配置 bcrypt 哈希。
 
 生产环境上线前必须使用单独的管理员密码哈希，禁止提交明文密码。
+
+`conf/app.ini` 和 `conf/app_test.ini` 包含数据库密码、JWT secret 和管理员密码哈希，只保留在本地或服务器上，不进入版本控制。仓库中只提交 `conf/app.example.ini` 和 `conf/app_test.example.ini`。
 
 ### 4. 运行服务
 ```bash
@@ -109,6 +118,8 @@ go test ./...
 - 测试账号：`jlg_test`
 - 测试配置文件：`conf/app_test.ini`
 - 测试库账号只授予 `jlg_test.*` 权限，避免测试误写生产数据
+
+首次在新机器运行测试前，先从 `conf/app_test.example.ini` 复制出 `conf/app_test.ini`，再填入测试库密码、JWT secret 和管理员 bcrypt 哈希。不要把真实测试配置提交到 Git。
 
 当前测试库初始化方式：
 
@@ -219,8 +230,8 @@ mysql -h 49.234.22.169 -P 3306 -u jlg_test -p jlg_test \
 │   ├── setting/           # 配置管理
 │   └── util/              # 通用工具
 ├── docs/                  # Swagger文档
-├── conf/                  # 配置文件
-├── runtime/               # 运行时文件
+├── conf/                  # 配置模板；真实 app.ini/app_test.ini 本地保存
+├── runtime/               # 运行时文件；日志和上传文件不进入版本控制
 │   ├── logs/              # 日志文件
 │   └── uploads/           # 上传文件
 └── *.sh                   # 测试脚本
