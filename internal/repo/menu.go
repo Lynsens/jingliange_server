@@ -27,7 +27,7 @@ func (m *MenuDB) GetMenuList(pageSize, pageNumber int, name string) ([]model.Men
 
 	// 添加模糊查询条件 - 搜索菜品名称和描述
 	if name != "" {
-		query = query.Where("(name LIKE ? OR `desc` LIKE ?)", "%"+name+"%", "%"+name+"%")
+		query = query.Where("(name LIKE ? OR `desc` LIKE ? OR category LIKE ?)", "%"+name+"%", "%"+name+"%", "%"+name+"%")
 	}
 
 	err := query.Order("is_recommended DESC, id ASC").Offset(offset).Limit(pageSize).Find(&menus).Error
@@ -59,7 +59,7 @@ func (m *MenuDB) GetMenuCount(name string) (int64, error) {
 
 	// 添加模糊查询条件 - 搜索菜品名称和描述
 	if name != "" {
-		query = query.Where("(name LIKE ? OR `desc` LIKE ?)", "%"+name+"%", "%"+name+"%")
+		query = query.Where("(name LIKE ? OR `desc` LIKE ? OR category LIKE ?)", "%"+name+"%", "%"+name+"%", "%"+name+"%")
 	}
 
 	err := query.Count(&count).Error
@@ -83,7 +83,7 @@ func (m *MenuDB) GetAdminMenuList(pageSize, pageNumber int, keyword string, arch
 
 	if keyword != "" {
 		like := "%" + keyword + "%"
-		query = query.Where("(CAST(id AS CHAR) = ? OR name LIKE ? OR `desc` LIKE ?)", keyword, like, like)
+		query = query.Where("(CAST(id AS CHAR) = ? OR name LIKE ? OR `desc` LIKE ? OR category LIKE ?)", keyword, like, like, like)
 	}
 
 	err := query.
@@ -166,6 +166,7 @@ func (m *MenuDB) UpdateMenu(menu model.Menu) error {
 
 		updates := map[string]interface{}{
 			"name":           menu.Name,
+			"category":       menu.Category,
 			"image_url":      menu.Image_url,
 			"desc":           menu.Desc,
 			"nutrition":      menu.Nutrition,

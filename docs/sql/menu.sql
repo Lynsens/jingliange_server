@@ -13,6 +13,9 @@ ALTER TABLE `jlg`.`menu`
 ADD COLUMN `name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '菜品名称' AFTER `id`;
 
 ALTER TABLE `jlg`.`menu`
+ADD COLUMN `category` VARCHAR(32) NOT NULL DEFAULT '热食' COMMENT '菜品分类：前菜/小菜、主食、热食、甜品/饮品' AFTER `name`;
+
+ALTER TABLE `jlg`.`menu`
 ADD COLUMN `ingredients` JSON NOT NULL COMMENT '成分表，JSON 格式' AFTER `nutrition`;
 
 ALTER TABLE `jlg`.`menu`

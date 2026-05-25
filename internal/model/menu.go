@@ -4,7 +4,8 @@ import "time"
 
 type Menu struct {
 	ID            int        `json:"id" gorm:"primaryKey;autoIncrement" example:"1"`
-	Name          string     `json:"name" gorm:"type:varchar(64);not null;default:''" example:"紫菜汤"` // 菜品名称
+	Name          string     `json:"name" gorm:"type:varchar(64);not null;default:''" example:"紫菜汤"`      // 菜品名称
+	Category      string     `json:"category" gorm:"type:varchar(32);not null;default:'热食'" example:"热食"` // 菜品分类：前菜/小菜、主食、热食、甜品/饮品
 	Image_url     string     `json:"image_url" gorm:"type:varchar(256);not null;default:''" example:"/images/menu.jpg"`
 	Desc          string     `json:"desc" gorm:"type:varchar(512);not null;default:''" example:"美味的菜品"`
 	Nutrition     string     `json:"nutrition" gorm:"type:varchar(512);not null;default:''" example:"{\"protein\": \"10g\", \"carbs\": \"20g\", \"fat\": \"5g\"}"`

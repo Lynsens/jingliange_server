@@ -30,6 +30,15 @@ func validateArchiveStatus(value string) string {
 	}
 }
 
+func normalizeMenuCategory(value string) string {
+	switch strings.TrimSpace(value) {
+	case "前菜/小菜", "主食", "热食", "甜品/饮品":
+		return strings.TrimSpace(value)
+	default:
+		return "热食"
+	}
+}
+
 // @Summary 管理员获取菜单列表
 // @Description 管理员菜单列表，可查看上架中和已下架菜品。
 // @Tags Menu
@@ -185,6 +194,7 @@ func UploadMenuItem(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Name and description are required")
 		return
 	}
+	menuItem.Category = normalizeMenuCategory(menuItem.Category)
 	menuItem.IsRecommended = normalizeBinaryFlag(menuItem.IsRecommended)
 	menuItem.IsArchived = normalizeBinaryFlag(menuItem.IsArchived)
 
@@ -237,6 +247,7 @@ func UpdateMenuItem(c *gin.Context) {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Name and description are required")
 		return
 	}
+	menuItem.Category = normalizeMenuCategory(menuItem.Category)
 	menuItem.IsRecommended = normalizeBinaryFlag(menuItem.IsRecommended)
 	menuItem.IsArchived = normalizeBinaryFlag(menuItem.IsArchived)
 	if menuItem.IsArchived == 1 && menuItem.IsRecommended == 1 {
