@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"errors"
 	"time"
 
 	"github.com/lynsens/jingliange_server/internal/model"
@@ -11,6 +12,8 @@ import (
 type MenuDB struct {
 	db *gorm.DB
 }
+
+var ErrInvalidComboItems = errors.New("invalid combo menu items")
 
 func NewMenuDB(db *gorm.DB) *MenuDB {
 	return &MenuDB{db: db}
@@ -473,4 +476,266 @@ func (m *MenuDB) GetMenuListWithUserLikes(pageSize, pageNumber int, name string,
 	}
 
 	return menusWithUserLikes, nil
+}
+
+func (m *MenuDB) GetActiveComboRecommendation(userID string) (model.ComboRecommendationResponse, error) {
+	var combo model.ComboRecommendation
+	if err := m.db.Table("combo_recommendation").
+		Where("status = ? AND is_active = ?", 1, 1).
+		Order("update_time DESC, id DESC").
+		First(&combo).Error; err != nil {
+		return model.ComboRecommendationResponse{}, err
+	}
+
+	items, err := m.getComboItems(combo.ID, userID, true)
+	if err != nil {
+		return model.ComboRecommendationResponse{}, err
+	}
+
+	return model.ComboRecommendationResponse{
+		ComboRecommendation: combo,
+		Items:               items,
+	}, nil
+}
+
+func (m *MenuDB) GetAdminComboRecommendationList(keyword string, pageSize int, pageNumber int) ([]model.ComboRecommendationResponse, error) {
+	if pageSize <= 0 {
+		pageSize = 20
+	}
+	if pageNumber < 0 {
+		pageNumber = 0
+	}
+
+	var combos []model.ComboRecommendation
+	query := m.db.Table("combo_recommendation").Where("status = ?", 1)
+	if keyword != "" {
+		like := "%" + keyword + "%"
+		query = query.Where("(title LIKE ? OR description LIKE ?)", like, like)
+	}
+
+	if err := query.
+		Order("is_active DESC, update_time DESC, id DESC").
+		Offset(pageNumber * pageSize).
+		Limit(pageSize).
+		Find(&combos).Error; err != nil {
+		return nil, err
+	}
+
+	responses := make([]model.ComboRecommendationResponse, 0, len(combos))
+	for _, combo := range combos {
+		items, err := m.getComboItems(combo.ID, "", false)
+		if err != nil {
+			return nil, err
+		}
+		responses = append(responses, model.ComboRecommendationResponse{
+			ComboRecommendation: combo,
+			Items:               items,
+		})
+	}
+
+	return responses, nil
+}
+
+func (m *MenuDB) CreateComboRecommendation(combo model.ComboRecommendation, menuIDs []int) error {
+	return m.db.Transaction(func(tx *gorm.DB) error {
+		if err := validateComboMenuIDs(tx, menuIDs); err != nil {
+			return err
+		}
+
+		combo.Status = 1
+		if combo.IsActive == 1 {
+			if err := tx.Table("combo_recommendation").
+				Where("status = ?", 1).
+				Update("is_active", 0).Error; err != nil {
+				return err
+			}
+		}
+
+		if err := tx.Table("combo_recommendation").Create(&combo).Error; err != nil {
+			return err
+		}
+
+		return createComboItems(tx, combo.ID, menuIDs)
+	})
+}
+
+func (m *MenuDB) UpdateComboRecommendation(combo model.ComboRecommendation, menuIDs []int) error {
+	return m.db.Transaction(func(tx *gorm.DB) error {
+		if err := validateComboMenuIDs(tx, menuIDs); err != nil {
+			return err
+		}
+
+		isActive := 0
+		if combo.IsActive == 1 {
+			isActive = 1
+			if err := tx.Table("combo_recommendation").
+				Where("id <> ? AND status = ?", combo.ID, 1).
+				Update("is_active", 0).Error; err != nil {
+				return err
+			}
+		}
+
+		result := tx.Table("combo_recommendation").
+			Where("id = ? AND status = ?", combo.ID, 1).
+			Updates(map[string]interface{}{
+				"title":       combo.Title,
+				"description": combo.Description,
+				"is_active":   isActive,
+			})
+		if result.Error != nil {
+			return result.Error
+		}
+		if result.RowsAffected == 0 {
+			return gorm.ErrRecordNotFound
+		}
+
+		if err := tx.Table("combo_recommendation_item").
+			Where("combo_id = ?", combo.ID).
+			Update("status", 0).Error; err != nil {
+			return err
+		}
+
+		return createComboItems(tx, combo.ID, menuIDs)
+	})
+}
+
+func (m *MenuDB) DeleteComboRecommendation(id uint64) error {
+	return m.db.Transaction(func(tx *gorm.DB) error {
+		result := tx.Table("combo_recommendation").
+			Where("id = ?", id).
+			Updates(map[string]interface{}{
+				"status":    0,
+				"is_active": 0,
+			})
+		if result.Error != nil {
+			return result.Error
+		}
+		if result.RowsAffected == 0 {
+			return gorm.ErrRecordNotFound
+		}
+
+		return tx.Table("combo_recommendation_item").
+			Where("combo_id = ?", id).
+			Update("status", 0).Error
+	})
+}
+
+func (m *MenuDB) SetComboRecommendationActive(id uint64, isActive int) error {
+	return m.db.Transaction(func(tx *gorm.DB) error {
+		active := 0
+		if isActive == 1 {
+			active = 1
+			if err := tx.Table("combo_recommendation").
+				Where("status = ?", 1).
+				Update("is_active", 0).Error; err != nil {
+				return err
+			}
+		}
+
+		result := tx.Table("combo_recommendation").
+			Where("id = ? AND status = ?", id, 1).
+			Update("is_active", active)
+		if result.Error != nil {
+			return result.Error
+		}
+		if result.RowsAffected == 0 {
+			return gorm.ErrRecordNotFound
+		}
+
+		return nil
+	})
+}
+
+func (m *MenuDB) getComboItems(comboID uint64, userID string, onlyVisible bool) ([]model.ComboRecommendationMenuItem, error) {
+	type row struct {
+		model.Menu
+		ComboItemID uint64
+		SortOrder   int
+	}
+
+	rows := []row{}
+	query := m.db.Table("combo_recommendation_item ci").
+		Select("m.*, ci.id AS combo_item_id, ci.sort_order").
+		Joins("JOIN menu m ON m.id = ci.menu_id").
+		Where("ci.combo_id = ? AND ci.status = ?", comboID, 1)
+	if onlyVisible {
+		query = query.Where("m.status = ? AND m.is_archived = ?", 1, 0)
+	} else {
+		query = query.Where("m.status = ?", 1)
+	}
+
+	if err := query.Order("ci.sort_order ASC, ci.id ASC").Scan(&rows).Error; err != nil {
+		return nil, err
+	}
+
+	items := make([]model.ComboRecommendationMenuItem, 0, len(rows))
+	for _, item := range rows {
+		likeCount, err := m.GetMenuLikeCount(item.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		liked := false
+		if userID != "" {
+			preference, err := m.GetMenuLikeStatus(item.ID, userID)
+			if err == nil {
+				liked = preference == 1
+			}
+		}
+
+		items = append(items, model.ComboRecommendationMenuItem{
+			MenuWithUserLikes: model.MenuWithUserLikes{
+				Menu:      item.Menu,
+				LikeCount: likeCount,
+				Liked:     liked,
+			},
+			ComboItemID: item.ComboItemID,
+			SortOrder:   item.SortOrder,
+		})
+	}
+
+	return items, nil
+}
+
+func validateComboMenuIDs(tx *gorm.DB, menuIDs []int) error {
+	if len(menuIDs) == 0 || len(menuIDs) > 4 {
+		return ErrInvalidComboItems
+	}
+
+	seen := make(map[int]struct{}, len(menuIDs))
+	for _, id := range menuIDs {
+		if id <= 0 {
+			return ErrInvalidComboItems
+		}
+		if _, exists := seen[id]; exists {
+			return ErrInvalidComboItems
+		}
+		seen[id] = struct{}{}
+	}
+
+	var count int64
+	if err := tx.Table("menu").
+		Where("id IN ? AND status = ? AND is_archived = ?", menuIDs, 1, 0).
+		Count(&count).Error; err != nil {
+		return err
+	}
+	if int(count) != len(menuIDs) {
+		return ErrInvalidComboItems
+	}
+
+	return nil
+}
+
+func createComboItems(tx *gorm.DB, comboID uint64, menuIDs []int) error {
+	items := make([]model.ComboRecommendationItem, 0, len(menuIDs))
+	for index, menuID := range menuIDs {
+		items = append(items, model.ComboRecommendationItem{
+			ComboID:   comboID,
+			MenuID:    menuID,
+			SortOrder: index,
+			Status:    1,
+		})
+	}
+
+	return tx.Table("combo_recommendation_item").Create(&items).Error
 }

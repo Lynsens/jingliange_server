@@ -46,6 +46,191 @@
                 }
             }
         },
+        "/api/admin/combo/active": {
+            "put": {
+                "description": "设置或取消一个套餐作为首页套餐推荐。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Combo"
+                ],
+                "summary": "管理员设置首页套餐推荐",
+                "parameters": [
+                    {
+                        "description": "启用状态",
+                        "name": "active",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ComboRecommendationActiveRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/combo/create": {
+            "post": {
+                "description": "创建一个套餐推荐，最多包含 4 个上架菜品。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Combo"
+                ],
+                "summary": "管理员创建套餐推荐",
+                "parameters": [
+                    {
+                        "description": "套餐内容",
+                        "name": "combo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ComboRecommendationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/combo/delete": {
+            "delete": {
+                "description": "删除套餐推荐。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Combo"
+                ],
+                "summary": "管理员删除套餐推荐",
+                "parameters": [
+                    {
+                        "description": "删除参数",
+                        "name": "delete",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ComboRecommendationIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/combo/list": {
+            "post": {
+                "description": "管理员查看套餐推荐列表。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Combo"
+                ],
+                "summary": "管理员获取套餐推荐列表",
+                "parameters": [
+                    {
+                        "description": "查询参数",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ComboRecommendationListRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.ComboRecommendationResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/combo/update": {
+            "put": {
+                "description": "更新套餐推荐标题、说明、菜品组合和启用状态。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Combo"
+                ],
+                "summary": "管理员更新套餐推荐",
+                "parameters": [
+                    {
+                        "description": "套餐内容",
+                        "name": "combo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ComboRecommendationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/admin/comment/delete": {
             "delete": {
                 "description": "管理员删除评论仅清空评论内容，不影响用户点赞状态。",
@@ -900,6 +1085,37 @@
                     },
                     "500": {
                         "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/combo/active": {
+            "get": {
+                "description": "获取首页当前启用的套餐推荐，包含套餐内可见菜品列表。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Combo"
+                ],
+                "summary": "获取当前套餐推荐",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token (可选)",
+                        "name": "Authorization",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"id\":1,\"title\":\"清淡养胃套餐\",\"items\":[]}}",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -1949,6 +2165,194 @@
                     "description": "用户ID（来自微信小程序）",
                     "type": "string",
                     "example": "user123"
+                }
+            }
+        },
+        "model.ComboRecommendationActiveRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_active": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "model.ComboRecommendationIDRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "model.ComboRecommendationListRequest": {
+            "type": "object",
+            "properties": {
+                "keyword": {
+                    "type": "string",
+                    "example": "清淡"
+                },
+                "page_number": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "page_size": {
+                    "type": "integer",
+                    "example": 20
+                }
+            }
+        },
+        "model.ComboRecommendationMenuItem": {
+            "type": "object",
+            "properties": {
+                "archive_time": {
+                    "description": "下架时间",
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
+                "combo_item_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "create_time": {
+                    "description": "Creation time",
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "美味的菜品"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "image_url": {
+                    "type": "string",
+                    "example": "/images/menu.jpg"
+                },
+                "ingredients": {
+                    "type": "string",
+                    "example": "{\"米\", \"豆腐\"}"
+                },
+                "is_archived": {
+                    "description": "是否下架：0 上架，1 下架",
+                    "type": "integer",
+                    "example": 0
+                },
+                "is_recommended": {
+                    "description": "是否今日推荐：0 否，1 是",
+                    "type": "integer",
+                    "example": 1
+                },
+                "like_count": {
+                    "description": "点赞数",
+                    "type": "integer",
+                    "example": 5
+                },
+                "liked": {
+                    "description": "当前用户是否已点赞",
+                    "type": "boolean",
+                    "example": true
+                },
+                "name": {
+                    "description": "菜品名称",
+                    "type": "string",
+                    "example": "紫菜汤"
+                },
+                "nutrition": {
+                    "type": "string",
+                    "example": "{\"protein\": \"10g\", \"carbs\": \"20g\", \"fat\": \"5g\"}"
+                },
+                "sort_order": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "status": {
+                    "description": "状态：0 删除，1 正常",
+                    "type": "integer",
+                    "example": 1
+                },
+                "update_time": {
+                    "description": "Update time",
+                    "type": "string",
+                    "example": "2012-1-1"
+                }
+            }
+        },
+        "model.ComboRecommendationRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "适合午餐，搭配均衡"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_active": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "menu_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "example": [
+                        1,
+                        2,
+                        3
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "example": "清淡养胃套餐"
+                }
+            }
+        },
+        "model.ComboRecommendationResponse": {
+            "type": "object",
+            "properties": {
+                "create_time": {
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "适合午餐，搭配均衡"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_active": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ComboRecommendationMenuItem"
+                    }
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "type": "string",
+                    "example": "清淡养胃套餐"
+                },
+                "update_time": {
+                    "type": "string",
+                    "example": "2012-1-1"
                 }
             }
         },

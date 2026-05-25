@@ -122,6 +122,60 @@ type MenuWithUserLikes struct {
 	Liked     bool  `json:"liked" example:"true"`   // 当前用户是否已点赞
 }
 
+type ComboRecommendation struct {
+	ID          uint64    `json:"id" gorm:"primaryKey;autoIncrement" example:"1"`
+	Title       string    `json:"title" gorm:"type:varchar(64);not null;default:''" example:"清淡养胃套餐"`
+	Description string    `json:"description" gorm:"type:varchar(512);not null;default:''" example:"适合午餐，搭配均衡"`
+	IsActive    int       `json:"is_active" gorm:"type:tinyint(1);not null;default:0" example:"1"`
+	Status      uint      `json:"status" gorm:"type:int unsigned;not null;default:1" example:"1"`
+	CreateTime  time.Time `json:"create_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"`
+	UpdateTime  time.Time `json:"update_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"`
+}
+
+type ComboRecommendationItem struct {
+	ID         uint64    `json:"id" gorm:"primaryKey;autoIncrement" example:"1"`
+	ComboID    uint64    `json:"combo_id" gorm:"type:bigint(20) unsigned;not null;default:0" example:"1"`
+	MenuID     int       `json:"menu_id" gorm:"type:bigint(20) unsigned;not null;default:0" example:"1"`
+	SortOrder  int       `json:"sort_order" gorm:"type:int unsigned;not null;default:0" example:"0"`
+	Status     uint      `json:"status" gorm:"type:int unsigned;not null;default:1" example:"1"`
+	CreateTime time.Time `json:"create_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"`
+	UpdateTime time.Time `json:"update_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"`
+}
+
+type ComboRecommendationMenuItem struct {
+	MenuWithUserLikes
+	ComboItemID uint64 `json:"combo_item_id" example:"1"`
+	SortOrder   int    `json:"sort_order" example:"0"`
+}
+
+type ComboRecommendationResponse struct {
+	ComboRecommendation
+	Items []ComboRecommendationMenuItem `json:"items"`
+}
+
+type ComboRecommendationRequest struct {
+	ID          uint64 `json:"id" example:"1"`
+	Title       string `json:"title" example:"清淡养胃套餐"`
+	Description string `json:"description" example:"适合午餐，搭配均衡"`
+	IsActive    int    `json:"is_active" example:"1"`
+	MenuIDs     []int  `json:"menu_ids" example:"1,2,3"`
+}
+
+type ComboRecommendationListRequest struct {
+	Keyword    string `json:"keyword" example:"清淡"`
+	PageSize   int    `json:"page_size" example:"20"`
+	PageNumber int    `json:"page_number" example:"0"`
+}
+
+type ComboRecommendationIDRequest struct {
+	ID uint64 `json:"id" example:"1"`
+}
+
+type ComboRecommendationActiveRequest struct {
+	ID       uint64 `json:"id" example:"1"`
+	IsActive int    `json:"is_active" example:"1"`
+}
+
 // MenuByIDRequest 获取单个菜品请求结构体
 type MenuByIDRequest struct {
 	MenuID int `json:"menu_id" example:"1"` // 菜品ID

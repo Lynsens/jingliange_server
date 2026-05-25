@@ -154,6 +154,144 @@ definitions:
         example: user123
         type: string
     type: object
+  model.ComboRecommendationActiveRequest:
+    properties:
+      id:
+        example: 1
+        type: integer
+      is_active:
+        example: 1
+        type: integer
+    type: object
+  model.ComboRecommendationIDRequest:
+    properties:
+      id:
+        example: 1
+        type: integer
+    type: object
+  model.ComboRecommendationListRequest:
+    properties:
+      keyword:
+        example: 清淡
+        type: string
+      page_number:
+        example: 0
+        type: integer
+      page_size:
+        example: 20
+        type: integer
+    type: object
+  model.ComboRecommendationMenuItem:
+    properties:
+      archive_time:
+        description: 下架时间
+        example: "2012-1-1"
+        type: string
+      combo_item_id:
+        example: 1
+        type: integer
+      create_time:
+        description: Creation time
+        example: "2012-1-1"
+        type: string
+      desc:
+        example: 美味的菜品
+        type: string
+      id:
+        example: 1
+        type: integer
+      image_url:
+        example: /images/menu.jpg
+        type: string
+      ingredients:
+        example: '{"米", "豆腐"}'
+        type: string
+      is_archived:
+        description: 是否下架：0 上架，1 下架
+        example: 0
+        type: integer
+      is_recommended:
+        description: 是否今日推荐：0 否，1 是
+        example: 1
+        type: integer
+      like_count:
+        description: 点赞数
+        example: 5
+        type: integer
+      liked:
+        description: 当前用户是否已点赞
+        example: true
+        type: boolean
+      name:
+        description: 菜品名称
+        example: 紫菜汤
+        type: string
+      nutrition:
+        example: '{"protein": "10g", "carbs": "20g", "fat": "5g"}'
+        type: string
+      sort_order:
+        example: 0
+        type: integer
+      status:
+        description: 状态：0 删除，1 正常
+        example: 1
+        type: integer
+      update_time:
+        description: Update time
+        example: "2012-1-1"
+        type: string
+    type: object
+  model.ComboRecommendationRequest:
+    properties:
+      description:
+        example: 适合午餐，搭配均衡
+        type: string
+      id:
+        example: 1
+        type: integer
+      is_active:
+        example: 1
+        type: integer
+      menu_ids:
+        example:
+        - 1
+        - 2
+        - 3
+        items:
+          type: integer
+        type: array
+      title:
+        example: 清淡养胃套餐
+        type: string
+    type: object
+  model.ComboRecommendationResponse:
+    properties:
+      create_time:
+        example: "2012-1-1"
+        type: string
+      description:
+        example: 适合午餐，搭配均衡
+        type: string
+      id:
+        example: 1
+        type: integer
+      is_active:
+        example: 1
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/model.ComboRecommendationMenuItem'
+        type: array
+      status:
+        example: 1
+        type: integer
+      title:
+        example: 清淡养胃套餐
+        type: string
+      update_time:
+        example: "2012-1-1"
+        type: string
+    type: object
   model.DeleteCommentRequest:
     properties:
       id:
@@ -744,6 +882,123 @@ paths:
       summary: 下架或重新上架菜品
       tags:
       - Menu
+  /api/admin/combo/active:
+    put:
+      consumes:
+      - application/json
+      description: 设置或取消一个套餐作为首页套餐推荐。
+      parameters:
+      - description: 启用状态
+        in: body
+        name: active
+        required: true
+        schema:
+          $ref: '#/definitions/model.ComboRecommendationActiveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 管理员设置首页套餐推荐
+      tags:
+      - Combo
+  /api/admin/combo/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建一个套餐推荐，最多包含 4 个上架菜品。
+      parameters:
+      - description: 套餐内容
+        in: body
+        name: combo
+        required: true
+        schema:
+          $ref: '#/definitions/model.ComboRecommendationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 管理员创建套餐推荐
+      tags:
+      - Combo
+  /api/admin/combo/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除套餐推荐。
+      parameters:
+      - description: 删除参数
+        in: body
+        name: delete
+        required: true
+        schema:
+          $ref: '#/definitions/model.ComboRecommendationIDRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 管理员删除套餐推荐
+      tags:
+      - Combo
+  /api/admin/combo/list:
+    post:
+      consumes:
+      - application/json
+      description: 管理员查看套餐推荐列表。
+      parameters:
+      - description: 查询参数
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/model.ComboRecommendationListRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.ComboRecommendationResponse'
+                  type: array
+              type: object
+      summary: 管理员获取套餐推荐列表
+      tags:
+      - Combo
+  /api/admin/combo/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新套餐推荐标题、说明、菜品组合和启用状态。
+      parameters:
+      - description: 套餐内容
+        in: body
+        name: combo
+        required: true
+        schema:
+          $ref: '#/definitions/model.ComboRecommendationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 管理员更新套餐推荐
+      tags:
+      - Combo
   /api/admin/comment/delete:
     delete:
       consumes:
@@ -1278,6 +1533,26 @@ paths:
       summary: 用户认证
       tags:
       - Auth
+  /api/v1/combo/active:
+    get:
+      consumes:
+      - application/json
+      description: 获取首页当前启用的套餐推荐，包含套餐内可见菜品列表。
+      parameters:
+      - description: Bearer token (可选)
+        in: header
+        name: Authorization
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":{"id":1,"title":"清淡养胃套餐","items":[]}}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 获取当前套餐推荐
+      tags:
+      - Combo
   /api/v1/donation/createDonation:
     post:
       consumes:

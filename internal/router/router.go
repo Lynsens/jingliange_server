@@ -62,6 +62,8 @@ func InitRouter() *gin.Engine {
 		apiOptional.POST("/menu/getMenu", v1.GetMenu)
 		//获取菜品评论列表（支持当前用户评论置顶）
 		apiOptional.POST("/menu/getComments", v1.GetMenuComments)
+		//获取当前套餐推荐
+		apiOptional.GET("/combo/active", v1.GetActiveComboRecommendation)
 		//提交建议箱内容
 		apiOptional.POST("/suggestion/create", v1.CreateSuggestion)
 	}
@@ -108,6 +110,12 @@ func InitRouter() *gin.Engine {
 		apiAdmin.PUT("/activity/update", admin.UpdateActivity)
 		apiAdmin.DELETE("/activity/delete", admin.DeleteActivity)
 		apiAdmin.PUT("/activity/top", admin.SetActivityTop)
+		// 套餐推荐管理
+		apiAdmin.POST("/combo/list", admin.GetComboRecommendations)
+		apiAdmin.POST("/combo/create", admin.CreateComboRecommendation)
+		apiAdmin.PUT("/combo/update", admin.UpdateComboRecommendation)
+		apiAdmin.PUT("/combo/active", admin.SetComboRecommendationActive)
+		apiAdmin.DELETE("/combo/delete", admin.DeleteComboRecommendation)
 		// 建议箱管理
 		apiAdmin.POST("/suggestion/list", admin.GetSuggestions)
 		apiAdmin.PUT("/suggestion/status", admin.UpdateSuggestionStatus)
