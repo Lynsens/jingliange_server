@@ -76,6 +76,8 @@ func InitRouter() *gin.Engine {
 		apiAuth.POST("/menu/comment", v1.CommentMenu)
 		//删除自己的菜品评论
 		apiAuth.DELETE("/menu/comment/delete", v1.DeleteMenuComment)
+		//评论点赞/取消点赞
+		apiAuth.POST("/menu/comment/like", v1.LikeMenuComment)
 		//创建捐款记录
 		apiAuth.POST("/donation/createDonation", v1.CreateDonation)
 	}

@@ -333,6 +333,13 @@ definitions:
         example: 1
         type: integer
     type: object
+  model.MenuCommentLikeRequest:
+    properties:
+      comment_id:
+        description: 评论反馈 ID
+        example: 1
+        type: integer
+    type: object
   model.MenuCommentRequest:
     properties:
       comment:
@@ -379,6 +386,12 @@ definitions:
         example: 1
         type: integer
       is_mine:
+        example: true
+        type: boolean
+      like_count:
+        example: 3
+        type: integer
+      liked:
         example: true
         type: boolean
       menu_id:
@@ -1382,11 +1395,40 @@ paths:
       summary: 删除自己的菜品评论
       tags:
       - Menu
+  /api/v1/menu/comment/like:
+    post:
+      consumes:
+      - application/json
+      description: 用户可对评论点赞；再次调用会取消点赞。
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 点赞参数
+        in: body
+        name: like
+        required: true
+        schema:
+          $ref: '#/definitions/model.MenuCommentLikeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":{"liked":true}}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 评论点赞/取消点赞
+      tags:
+      - Menu
   /api/v1/menu/getComments:
     post:
       consumes:
       - application/json
-      description: 获取指定菜品的评论列表，支持分页；带用户 token 时当前用户评论优先展示。
+      description: 获取指定菜品的评论列表，支持分页；带用户 token 时当前用户评论优先展示，并返回当前用户是否点赞评论。
       parameters:
       - description: 查询参数
         in: body
@@ -1398,7 +1440,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"msg":"ok","data":[{"id":1,"menu_id":1,"user_id":"user123","preference":1,"comment":"非常好吃！","status":1,"is_mine":true}]}'
+          description: '{"code":200,"msg":"ok","data":[{"id":1,"menu_id":1,"user_id":"user123","preference":1,"comment":"非常好吃！","status":1,"is_mine":true,"like_count":3,"liked":true}]}'
           schema:
             allOf:
             - $ref: '#/definitions/app.Response'

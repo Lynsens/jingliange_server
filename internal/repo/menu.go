@@ -351,8 +351,60 @@ func (m *MenuDB) GetMenuComments(menuID int, pageSize, pageNumber int, currentUs
 	for i := range comments {
 		comments[i].IsMine = currentUserID != "" && comments[i].UserID == currentUserID
 	}
+	if err := m.fillCommentLikeState(comments, currentUserID); err != nil {
+		return nil, err
+	}
 
 	return comments, nil
+}
+
+func (m *MenuDB) fillCommentLikeState(comments []model.MenuFeedback, currentUserID string) error {
+	if len(comments) == 0 {
+		return nil
+	}
+
+	commentIDs := make([]int, 0, len(comments))
+	indexByID := make(map[int]int, len(comments))
+	for i, comment := range comments {
+		commentIDs = append(commentIDs, comment.ID)
+		indexByID[comment.ID] = i
+	}
+
+	type likeCountRow struct {
+		CommentID int
+		Count     int64
+	}
+	var counts []likeCountRow
+	if err := m.db.Table("menu_comment_like").
+		Select("comment_id, COUNT(*) AS count").
+		Where("comment_id IN ? AND status = ?", commentIDs, 1).
+		Group("comment_id").
+		Scan(&counts).Error; err != nil {
+		return err
+	}
+	for _, row := range counts {
+		if index, ok := indexByID[row.CommentID]; ok {
+			comments[index].LikeCount = row.Count
+		}
+	}
+
+	if currentUserID == "" {
+		return nil
+	}
+
+	var likedRows []model.MenuCommentLike
+	if err := m.db.Table("menu_comment_like").
+		Where("comment_id IN ? AND user_id = ? AND status = ?", commentIDs, currentUserID, 1).
+		Find(&likedRows).Error; err != nil {
+		return err
+	}
+	for _, row := range likedRows {
+		if index, ok := indexByID[row.CommentID]; ok {
+			comments[index].Liked = true
+		}
+	}
+
+	return nil
 }
 
 func (m *MenuDB) GetMenuCommentCount(menuID int) (int64, error) {
@@ -402,6 +454,45 @@ func (m *MenuDB) ClearOwnMenuComment(id int, userID string) error {
 		return gorm.ErrRecordNotFound
 	}
 	return nil
+}
+
+func (m *MenuDB) ToggleMenuCommentLike(commentID int, userID string) (bool, error) {
+	returnedLiked := false
+	err := m.db.Transaction(func(tx *gorm.DB) error {
+		var comment model.MenuFeedback
+		if err := tx.Table("menu_feedback").
+			Where("id = ? AND status = ? AND comment != ?", commentID, 1, "").
+			First(&comment).Error; err != nil {
+			return err
+		}
+
+		var existing model.MenuCommentLike
+		err := tx.Table("menu_comment_like").
+			Where("comment_id = ? AND user_id = ?", commentID, userID).
+			First(&existing).Error
+		if err == nil {
+			newStatus := uint(1)
+			if existing.Status == 1 {
+				newStatus = 0
+			}
+			returnedLiked = newStatus == 1
+			return tx.Table("menu_comment_like").
+				Where("id = ?", existing.ID).
+				Update("status", newStatus).Error
+		}
+		if err != gorm.ErrRecordNotFound {
+			return err
+		}
+
+		returnedLiked = true
+		return tx.Table("menu_comment_like").Create(&model.MenuCommentLike{
+			CommentID: commentID,
+			UserID:    userID,
+			Status:    1,
+		}).Error
+	})
+
+	return returnedLiked, err
 }
 
 func (m *MenuDB) GetMenuByIDWithLikes(id int) (model.MenuWithLikes, error) {

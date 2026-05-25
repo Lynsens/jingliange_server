@@ -1195,9 +1195,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/menu/comment/like": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "用户可对评论点赞；再次调用会取消点赞。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "评论点赞/取消点赞",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "点赞参数",
+                        "name": "like",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.MenuCommentLikeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"liked\":true}}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/menu/getComments": {
             "post": {
-                "description": "获取指定菜品的评论列表，支持分页；带用户 token 时当前用户评论优先展示。",
+                "description": "获取指定菜品的评论列表，支持分页；带用户 token 时当前用户评论优先展示，并返回当前用户是否点赞评论。",
                 "consumes": [
                     "application/json"
                 ],
@@ -1221,7 +1267,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"menu_id\":1,\"user_id\":\"user123\",\"preference\":1,\"comment\":\"非常好吃！\",\"status\":1,\"is_mine\":true}]}",
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"menu_id\":1,\"user_id\":\"user123\",\"preference\":1,\"comment\":\"非常好吃！\",\"status\":1,\"is_mine\":true,\"like_count\":3,\"liked\":true}]}",
                         "schema": {
                             "allOf": [
                                 {
@@ -2063,6 +2109,16 @@ const docTemplate = `{
                 }
             }
         },
+        "model.MenuCommentLikeRequest": {
+            "type": "object",
+            "properties": {
+                "comment_id": {
+                    "description": "评论反馈 ID",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "model.MenuCommentRequest": {
             "type": "object",
             "properties": {
@@ -2124,6 +2180,14 @@ const docTemplate = `{
                     "example": 1
                 },
                 "is_mine": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "like_count": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "liked": {
                     "type": "boolean",
                     "example": true
                 },
