@@ -29,17 +29,6 @@ type MenuFeedback struct {
 	CreateTime    time.Time `json:"create_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"` // Creation time
 	UpdateTime    time.Time `json:"update_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"` // Update time
 	IsMine        bool      `json:"is_mine" gorm:"-" example:"true"`
-	LikeCount     int64     `json:"like_count" gorm:"-" example:"3"`
-	Liked         bool      `json:"liked" gorm:"-" example:"true"`
-}
-
-type MenuCommentLike struct {
-	ID         int       `json:"id" gorm:"primaryKey;autoIncrement" example:"1"`
-	CommentID  int       `json:"comment_id" gorm:"type:bigint(20) unsigned;not null;default:0" example:"1"`
-	UserID     string    `json:"user_id" gorm:"type:varchar(64);not null;default:''" example:"user123"`
-	Status     uint      `json:"status" gorm:"type:int unsigned;not null;default:1" example:"1"`
-	CreateTime time.Time `json:"create_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"`
-	UpdateTime time.Time `json:"update_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"`
 }
 
 // AdminCommentItem 管理员评论列表项
@@ -98,10 +87,6 @@ type ArchiveMenuRequest struct {
 // DeleteCommentRequest 删除评论请求结构体
 type DeleteCommentRequest struct {
 	ID int `json:"id" example:"1"` // 评论反馈 ID
-}
-
-type MenuCommentLikeRequest struct {
-	CommentID int `json:"comment_id" example:"1"` // 评论反馈 ID
 }
 
 // MenuLikeRequest 菜品点赞请求结构体（用户ID从JWT token中获取）

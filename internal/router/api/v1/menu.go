@@ -402,63 +402,13 @@ func DeleteMenuComment(c *gin.Context) {
 	appG.Response(http.StatusOK, e.SUCCESS, "comment deleted successfully")
 }
 
-// @Summary 评论点赞/取消点赞
-// @Description 用户可对评论点赞；再次调用会取消点赞。
-// @Tags Menu
-// @Accept json
-// @Security ApiKeyAuth
-// @Param Authorization header string true "Bearer token"
-// @Param like body model.MenuCommentLikeRequest true "点赞参数" schemaexample({"comment_id":1})
-// @Produce json
-// @Success 200 {object} app.Response "{"code":200,"msg":"ok","data":{"liked":true}}"
-// @Router /api/v1/menu/comment/like [post]
-func LikeMenuComment(c *gin.Context) {
-	appG := app.Gin{C: c}
-
-	db, err := repo.ConnectDb()
-	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR_DB, nil)
-		return
-	}
-
-	menuRepo := repo.NewMenuDB(db)
-
-	userID, exists := c.Get("user_id")
-	if !exists {
-		appG.Response(http.StatusUnauthorized, e.ERROR_AUTH, "User ID not found in token")
-		return
-	}
-
-	var req model.MenuCommentLikeRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid input data")
-		return
-	}
-	if req.CommentID <= 0 {
-		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, "Invalid comment ID")
-		return
-	}
-
-	liked, err := menuRepo.ToggleMenuCommentLike(req.CommentID, userID.(string))
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			appG.Response(http.StatusNotFound, e.ERROR, "Comment not found")
-		} else {
-			appG.Response(http.StatusInternalServerError, e.ERROR, nil)
-		}
-		return
-	}
-
-	appG.Response(http.StatusOK, e.SUCCESS, gin.H{"liked": liked})
-}
-
 // @Summary 获取菜品评论列表
-// @Description 获取指定菜品的评论列表，支持分页；带用户 token 时当前用户评论优先展示，并返回当前用户是否点赞评论。
+// @Description 获取指定菜品的评论列表，支持分页；带用户 token 时当前用户评论优先展示。
 // @Tags Menu
 // @Accept json
 // @Param query body model.MenuCommentsQueryRequest true "查询参数" schemaexample({"menu_id":1,"page_size":10,"page_number":0})
 // @Produce  json
-// @Success 200 {object} app.Response{data=[]model.MenuFeedback} "{"code":200,"msg":"ok","data":[{"id":1,"menu_id":1,"user_id":"user123","preference":1,"comment":"非常好吃！","status":1,"is_mine":true,"like_count":3,"liked":true}]}"
+// @Success 200 {object} app.Response{data=[]model.MenuFeedback} "{"code":200,"msg":"ok","data":[{"id":1,"menu_id":1,"user_id":"user123","preference":1,"comment":"非常好吃！","status":1,"is_mine":true}]}"
 // @Failure 400 {object} app.Response "{"code":400,"msg":"invalid params","data":"Invalid input data"}"
 // @Failure 404 {object} app.Response "{"code":404,"msg":"not found","data":"Menu item not found"}"
 // @Failure 500 {object} app.Response "{"code":500,"msg":"internal server error","data":null}"
