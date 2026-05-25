@@ -110,6 +110,32 @@ definitions:
         example: 20
         type: integer
     type: object
+  model.AdminSuggestionListRequest:
+    properties:
+      handle_status:
+        description: all, pending, handled
+        example: all
+        type: string
+      keyword:
+        example: 清淡
+        type: string
+      page_number:
+        example: 0
+        type: integer
+      page_size:
+        example: 20
+        type: integer
+    type: object
+  model.AdminSuggestionStatusRequest:
+    properties:
+      handle_status:
+        description: 0 未处理，1 已处理
+        example: 1
+        type: integer
+      id:
+        example: 1
+        type: integer
+    type: object
   model.ArchiveMenuRequest:
     properties:
       id:
@@ -638,6 +664,56 @@ definitions:
         example: 1
         type: integer
     type: object
+  model.Suggestion:
+    properties:
+      contact:
+        example: 微信或手机号
+        type: string
+      content:
+        example: 希望增加更多清淡菜品
+        type: string
+      create_time:
+        description: Creation time
+        type: string
+      handle_status:
+        description: 处理状态：0 未处理，1 已处理
+        example: 0
+        type: integer
+      id:
+        example: 1
+        type: integer
+      status:
+        description: 记录状态：0 删除，1 正常
+        example: 1
+        type: integer
+      update_time:
+        description: Update time
+        type: string
+      user_avatar_url:
+        example: /uploads/images/avatar.jpg
+        type: string
+      user_id:
+        example: user123
+        type: string
+      user_nickname:
+        example: 莲友
+        type: string
+    type: object
+  model.SuggestionCreateRequest:
+    properties:
+      contact:
+        example: 微信或手机号
+        type: string
+      content:
+        example: 希望增加更多清淡菜品
+        type: string
+      user_avatar_url:
+        example: /uploads/images/avatar.jpg
+        type: string
+      user_nickname:
+        example: 莲友
+        type: string
+    type: object
 host: 49.234.22.169:8000
 info:
   contact: {}
@@ -974,6 +1050,57 @@ paths:
       summary: 设置今日推荐菜品
       tags:
       - Menu
+  /api/admin/suggestion/list:
+    post:
+      consumes:
+      - application/json
+      description: 管理员查看用户建议，可按内容、联系方式、用户搜索。
+      parameters:
+      - description: 查询参数
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/model.AdminSuggestionListRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Suggestion'
+                  type: array
+              type: object
+      summary: 管理员获取建议列表
+      tags:
+      - Suggestion
+  /api/admin/suggestion/status:
+    put:
+      consumes:
+      - application/json
+      description: 管理员将建议标记为未处理或已处理。
+      parameters:
+      - description: 处理状态
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/model.AdminSuggestionStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 管理员更新建议处理状态
+      tags:
+      - Suggestion
   /api/admin/updateMenuItem:
     put:
       consumes:
@@ -1594,6 +1721,37 @@ paths:
       summary: 菜品点赞
       tags:
       - Menu
+  /api/v1/suggestion/create:
+    post:
+      consumes:
+      - application/json
+      description: 用户提交对餐厅、菜单或小程序的建议，联系方式可选。
+      parameters:
+      - description: 建议内容
+        in: body
+        name: suggestion
+        required: true
+        schema:
+          $ref: '#/definitions/model.SuggestionCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"suggestion submitted successfully"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: '{"code":400,"msg":"invalid params","data":"Suggestion content
+            is required"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: '{"code":500,"msg":"internal server error","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 提交建议箱内容
+      tags:
+      - Suggestion
   /api/v1/uploadImage:
     post:
       description: 上传净莲阁的图片。支持图片格式检查和大小限制，返回图片的访问地址、保存路径和文件名。

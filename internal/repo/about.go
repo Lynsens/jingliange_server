@@ -96,3 +96,45 @@ func (a *aboutDB) SetActivityTop(id uint64, isTop int) error {
 		Where("id = ? AND status = ?", id, 1).
 		Update("is_top", isTop).Error
 }
+
+func (a *aboutDB) CreateSuggestion(suggestion model.Suggestion) error {
+	suggestion.Status = 1
+	suggestion.HandleStatus = 0
+	return a.db.Table("suggestion").Create(&suggestion).Error
+}
+
+func (a *aboutDB) GetAdminSuggestionList(keyword string, handleStatus string, pageSize int, pageNumber int) ([]model.Suggestion, error) {
+	if pageSize <= 0 {
+		pageSize = setting.AppSetting.PageSize
+	}
+	if pageNumber < 0 {
+		pageNumber = 0
+	}
+
+	suggestions := []model.Suggestion{}
+	query := a.db.Table("suggestion").Where("status = ?", 1)
+	switch handleStatus {
+	case "pending":
+		query = query.Where("handle_status = ?", 0)
+	case "handled":
+		query = query.Where("handle_status = ?", 1)
+	}
+
+	if keyword != "" {
+		like := "%" + keyword + "%"
+		query = query.Where("(content LIKE ? OR contact LIKE ? OR user_id LIKE ? OR user_nickname LIKE ?)", like, like, like, like)
+	}
+
+	err := query.
+		Offset(pageNumber * pageSize).
+		Limit(pageSize).
+		Order("handle_status ASC, create_time DESC").
+		Find(&suggestions).Error
+	return suggestions, err
+}
+
+func (a *aboutDB) SetSuggestionHandleStatus(id uint64, handleStatus uint) error {
+	return a.db.Table("suggestion").
+		Where("id = ? AND status = ?", id, 1).
+		Update("handle_status", handleStatus).Error
+}

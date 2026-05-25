@@ -543,6 +543,89 @@
                 }
             }
         },
+        "/api/admin/suggestion/list": {
+            "post": {
+                "description": "管理员查看用户建议，可按内容、联系方式、用户搜索。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Suggestion"
+                ],
+                "summary": "管理员获取建议列表",
+                "parameters": [
+                    {
+                        "description": "查询参数",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AdminSuggestionListRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.Suggestion"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/suggestion/status": {
+            "put": {
+                "description": "管理员将建议标记为未处理或已处理。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Suggestion"
+                ],
+                "summary": "管理员更新建议处理状态",
+                "parameters": [
+                    {
+                        "description": "处理状态",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AdminSuggestionStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/admin/updateMenuItem": {
             "put": {
                 "description": "根据菜品ID更新名称、简介、图片url、营养价值表和主要成分。图片url、营养价值表和主要成分可选，营养价值表和主要成分需要以JSON字符串格式提供。",
@@ -1529,6 +1612,52 @@
                 }
             }
         },
+        "/api/v1/suggestion/create": {
+            "post": {
+                "description": "用户提交对餐厅、菜单或小程序的建议，联系方式可选。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Suggestion"
+                ],
+                "summary": "提交建议箱内容",
+                "parameters": [
+                    {
+                        "description": "建议内容",
+                        "name": "suggestion",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SuggestionCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":\"suggestion submitted successfully\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Suggestion content is required\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/uploadImage": {
             "post": {
                 "description": "上传净莲阁的图片。支持图片格式检查和大小限制，返回图片的访问地址、保存路径和文件名。",
@@ -1759,6 +1888,42 @@
                     "description": "每页数量",
                     "type": "integer",
                     "example": 20
+                }
+            }
+        },
+        "model.AdminSuggestionListRequest": {
+            "type": "object",
+            "properties": {
+                "handle_status": {
+                    "description": "all, pending, handled",
+                    "type": "string",
+                    "example": "all"
+                },
+                "keyword": {
+                    "type": "string",
+                    "example": "清淡"
+                },
+                "page_number": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "page_size": {
+                    "type": "integer",
+                    "example": 20
+                }
+            }
+        },
+        "model.AdminSuggestionStatusRequest": {
+            "type": "object",
+            "properties": {
+                "handle_status": {
+                    "description": "0 未处理，1 已处理",
+                    "type": "integer",
+                    "example": 1
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -2478,6 +2643,74 @@
                     "description": "是否设为今日推荐：0 否，1 是",
                     "type": "integer",
                     "example": 1
+                }
+            }
+        },
+        "model.Suggestion": {
+            "type": "object",
+            "properties": {
+                "contact": {
+                    "type": "string",
+                    "example": "微信或手机号"
+                },
+                "content": {
+                    "type": "string",
+                    "example": "希望增加更多清淡菜品"
+                },
+                "create_time": {
+                    "description": "Creation time",
+                    "type": "string"
+                },
+                "handle_status": {
+                    "description": "处理状态：0 未处理，1 已处理",
+                    "type": "integer",
+                    "example": 0
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "description": "记录状态：0 删除，1 正常",
+                    "type": "integer",
+                    "example": 1
+                },
+                "update_time": {
+                    "description": "Update time",
+                    "type": "string"
+                },
+                "user_avatar_url": {
+                    "type": "string",
+                    "example": "/uploads/images/avatar.jpg"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "user123"
+                },
+                "user_nickname": {
+                    "type": "string",
+                    "example": "莲友"
+                }
+            }
+        },
+        "model.SuggestionCreateRequest": {
+            "type": "object",
+            "properties": {
+                "contact": {
+                    "type": "string",
+                    "example": "微信或手机号"
+                },
+                "content": {
+                    "type": "string",
+                    "example": "希望增加更多清淡菜品"
+                },
+                "user_avatar_url": {
+                    "type": "string",
+                    "example": "/uploads/images/avatar.jpg"
+                },
+                "user_nickname": {
+                    "type": "string",
+                    "example": "莲友"
                 }
             }
         }

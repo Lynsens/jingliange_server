@@ -62,6 +62,8 @@ func InitRouter() *gin.Engine {
 		apiOptional.POST("/menu/getMenu", v1.GetMenu)
 		//获取菜品评论列表（支持当前用户评论置顶）
 		apiOptional.POST("/menu/getComments", v1.GetMenuComments)
+		//提交建议箱内容
+		apiOptional.POST("/suggestion/create", v1.CreateSuggestion)
 	}
 
 	// 需要认证的接口
@@ -106,6 +108,9 @@ func InitRouter() *gin.Engine {
 		apiAdmin.PUT("/activity/update", admin.UpdateActivity)
 		apiAdmin.DELETE("/activity/delete", admin.DeleteActivity)
 		apiAdmin.PUT("/activity/top", admin.SetActivityTop)
+		// 建议箱管理
+		apiAdmin.POST("/suggestion/list", admin.GetSuggestions)
+		apiAdmin.PUT("/suggestion/status", admin.UpdateSuggestionStatus)
 		// 只读运维维护面板
 		apiAdmin.GET("/ops/summary", admin.GetOpsSummary)
 		apiAdmin.GET("/ops/access-logs", admin.GetOpsAccessLogs)
