@@ -14,10 +14,16 @@ definitions:
       create_time:
         description: Creation time
         type: string
+      event_time:
+        type: string
       id:
         type: integer
       img:
         description: Image address
+        type: string
+      is_top:
+        type: integer
+      place:
         type: string
       status:
         type: integer
@@ -38,12 +44,96 @@ definitions:
         example: 0
         type: integer
     type: object
+  model.AdminCommentItem:
+    properties:
+      comment:
+        type: string
+      create_time:
+        type: string
+      id:
+        type: integer
+      menu_id:
+        type: integer
+      menu_name:
+        type: string
+      preference:
+        type: integer
+      update_time:
+        type: string
+      user_avatar_url:
+        type: string
+      user_id:
+        type: string
+      user_nickname:
+        type: string
+    type: object
+  model.AdminCommentListRequest:
+    properties:
+      keyword:
+        description: 评论、用户 ID、菜品名称或 ID
+        example: 好吃
+        type: string
+      page_number:
+        description: 页码，从零开始
+        example: 0
+        type: integer
+      page_size:
+        description: 每页数量
+        example: 20
+        type: integer
+    type: object
+  model.AdminLoginRequest:
+    properties:
+      password:
+        example: <admin-password>
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+  model.AdminMenuListRequest:
+    properties:
+      archive_status:
+        description: all, active, archived
+        example: all
+        type: string
+      keyword:
+        description: 菜单名称、介绍或 ID
+        example: 紫菜汤
+        type: string
+      page_number:
+        description: 页码，从零开始
+        example: 0
+        type: integer
+      page_size:
+        description: 每页数量
+        example: 20
+        type: integer
+    type: object
+  model.ArchiveMenuRequest:
+    properties:
+      id:
+        description: 菜品ID
+        example: 1
+        type: integer
+      is_archived:
+        description: 是否下架：0 上架，1 下架
+        example: 1
+        type: integer
+    type: object
   model.AuthRequest:
     properties:
       user_id:
         description: 用户ID（来自微信小程序）
         example: user123
         type: string
+    type: object
+  model.DeleteCommentRequest:
+    properties:
+      id:
+        description: 评论反馈 ID
+        example: 1
+        type: integer
     type: object
   model.DeleteMenuRequest:
     properties:
@@ -192,6 +282,10 @@ definitions:
     type: object
   model.Menu:
     properties:
+      archive_time:
+        description: 下架时间
+        example: "2012-1-1"
+        type: string
       create_time:
         description: Creation time
         example: "2012-1-1"
@@ -208,6 +302,14 @@ definitions:
       ingredients:
         example: '{"米", "豆腐"}'
         type: string
+      is_archived:
+        description: 是否下架：0 上架，1 下架
+        example: 0
+        type: integer
+      is_recommended:
+        description: 是否今日推荐：0 否，1 是
+        example: 1
+        type: integer
       name:
         description: 菜品名称
         example: 紫菜汤
@@ -241,6 +343,13 @@ definitions:
         description: 菜品ID
         example: 1
         type: integer
+      user_avatar_url:
+        example: /uploads/images/avatar.jpg
+        type: string
+      user_nickname:
+        description: 评论展示昵称
+        example: 莲友
+        type: string
     type: object
   model.MenuCommentsQueryRequest:
     properties:
@@ -285,9 +394,15 @@ definitions:
         description: Update time
         example: "2012-1-1"
         type: string
+      user_avatar_url:
+        example: /uploads/images/avatar.jpg
+        type: string
       user_id:
-        description: "用户\t ID"
+        description: 用户 ID
         example: user123
+        type: string
+      user_nickname:
+        example: 莲友
         type: string
     type: object
   model.MenuLikeRequest:
@@ -314,6 +429,10 @@ definitions:
     type: object
   model.MenuWithLikes:
     properties:
+      archive_time:
+        description: 下架时间
+        example: "2012-1-1"
+        type: string
       create_time:
         description: Creation time
         example: "2012-1-1"
@@ -330,6 +449,14 @@ definitions:
       ingredients:
         example: '{"米", "豆腐"}'
         type: string
+      is_archived:
+        description: 是否下架：0 上架，1 下架
+        example: 0
+        type: integer
+      is_recommended:
+        description: 是否今日推荐：0 否，1 是
+        example: 1
+        type: integer
       like_count:
         description: 点赞数
         example: 5
@@ -352,6 +479,10 @@ definitions:
     type: object
   model.MenuWithUserLikes:
     properties:
+      archive_time:
+        description: 下架时间
+        example: "2012-1-1"
+        type: string
       create_time:
         description: Creation time
         example: "2012-1-1"
@@ -368,6 +499,14 @@ definitions:
       ingredients:
         example: '{"米", "豆腐"}'
         type: string
+      is_archived:
+        description: 是否下架：0 上架，1 下架
+        example: 0
+        type: integer
+      is_recommended:
+        description: 是否今日推荐：0 否，1 是
+        example: 1
+        type: integer
       like_count:
         description: 点赞数
         example: 5
@@ -392,6 +531,110 @@ definitions:
         example: "2012-1-1"
         type: string
     type: object
+  model.OpsAccessLogItem:
+    properties:
+      bytes:
+        type: integer
+      ip:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+      protocol:
+        type: string
+      raw:
+        type: string
+      referer:
+        type: string
+      status:
+        type: integer
+      time:
+        type: string
+      user_agent:
+        type: string
+    type: object
+  model.OpsAccessLogResponse:
+    properties:
+      date:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/model.OpsAccessLogItem'
+        type: array
+      source_exists:
+        type: boolean
+    type: object
+  model.OpsPathStat:
+    properties:
+      count:
+        type: integer
+      path:
+        type: string
+    type: object
+  model.OpsStatusStat:
+    properties:
+      count:
+        type: integer
+      status:
+        type: integer
+    type: object
+  model.OpsSummary:
+    properties:
+      date:
+        type: string
+      source_exists:
+        type: boolean
+      status_4xx:
+        type: integer
+      status_5xx:
+        type: integer
+      status_counts:
+        items:
+          $ref: '#/definitions/model.OpsStatusStat'
+        type: array
+      top_paths:
+        items:
+          $ref: '#/definitions/model.OpsPathStat'
+        type: array
+      total_bytes:
+        type: integer
+      total_requests:
+        type: integer
+      unique_ips:
+        type: integer
+    type: object
+  model.OpsTextLogItem:
+    properties:
+      level:
+        type: string
+      raw:
+        type: string
+      time:
+        type: string
+    type: object
+  model.OpsTextLogResponse:
+    properties:
+      date:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/model.OpsTextLogItem'
+        type: array
+      source_exists:
+        type: boolean
+    type: object
+  model.SetMenuRecommendationRequest:
+    properties:
+      id:
+        description: 菜品ID
+        example: 1
+        type: integer
+      is_recommended:
+        description: 是否设为今日推荐：0 否，1 是
+        example: 1
+        type: integer
+    type: object
 host: 49.234.22.169:8000
 info:
   contact: {}
@@ -400,6 +643,79 @@ info:
   title: Jingliange Server API
   version: "1.0"
 paths:
+  /api/admin/archiveMenuItem:
+    put:
+      consumes:
+      - application/json
+      description: 设置菜品 archive 状态。下架今日推荐菜品时会自动取消今日推荐。
+      parameters:
+      - description: 下架参数
+        in: body
+        name: archive
+        required: true
+        schema:
+          $ref: '#/definitions/model.ArchiveMenuRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 下架或重新上架菜品
+      tags:
+      - Menu
+  /api/admin/comment/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 管理员删除评论仅清空评论内容，不影响用户点赞状态。
+      parameters:
+      - description: 删除参数
+        in: body
+        name: delete
+        required: true
+        schema:
+          $ref: '#/definitions/model.DeleteCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 管理员删除评论
+      tags:
+      - Menu
+  /api/admin/comment/list:
+    post:
+      consumes:
+      - application/json
+      description: 管理员评论列表，可按评论内容、用户 ID、菜品名称或 ID 搜索。
+      parameters:
+      - description: 查询参数
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/model.AdminCommentListRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.AdminCommentItem'
+                  type: array
+              type: object
+      summary: 管理员获取评论列表
+      tags:
+      - Menu
   /api/admin/deleteMenuItem:
     delete:
       consumes:
@@ -434,11 +750,267 @@ paths:
       summary: 删除菜品
       tags:
       - Menu
+  /api/admin/login:
+    post:
+      consumes:
+      - application/json
+      description: 使用配置文件中的管理员账号登录，返回管理员JWT token
+      parameters:
+      - description: 管理员登录参数
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/model.AdminLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":{"token":"...","username":"admin","role":"admin"}}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+        "400":
+          description: '{"code":400,"msg":"请求参数错误","data":"Username and password are
+            required"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "401":
+          description: '{"code":20004,"msg":"Token错误","data":"Invalid username or
+            password"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 管理员登录
+      tags:
+      - Admin
+  /api/admin/menu/list:
+    post:
+      consumes:
+      - application/json
+      description: 管理员菜单列表，可查看上架中和已下架菜品。
+      parameters:
+      - description: 查询参数
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/model.AdminMenuListRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.MenuWithLikes'
+                  type: array
+              type: object
+      summary: 管理员获取菜单列表
+      tags:
+      - Menu
+  /api/admin/ops/access-logs:
+    get:
+      description: 只读读取配置指定的 Nginx access log。
+      parameters:
+      - description: 日期，格式 YYYY-MM-DD
+        in: query
+        name: date
+        type: string
+      - description: 最大返回条数，最多 500
+        in: query
+        name: limit
+        type: integer
+      - description: 关键词
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.OpsAccessLogResponse'
+              type: object
+      summary: 管理员获取 Nginx 访问日志
+      tags:
+      - AdminOps
+  /api/admin/ops/app-logs:
+    get:
+      description: 只读读取配置指定的后端应用日志目录。
+      parameters:
+      - description: 日期，格式 YYYY-MM-DD
+        in: query
+        name: date
+        type: string
+      - description: 最大返回条数，最多 500
+        in: query
+        name: limit
+        type: integer
+      - description: 日志级别，例如 INFO、WARN、ERROR
+        in: query
+        name: level
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.OpsTextLogResponse'
+              type: object
+      summary: 管理员获取后端应用日志
+      tags:
+      - AdminOps
+  /api/admin/ops/error-logs:
+    get:
+      description: 只读读取配置指定的 Nginx error log。
+      parameters:
+      - description: 日期，格式 YYYY-MM-DD
+        in: query
+        name: date
+        type: string
+      - description: 最大返回条数，最多 500
+        in: query
+        name: limit
+        type: integer
+      - description: 关键词
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.OpsTextLogResponse'
+              type: object
+      summary: 管理员获取 Nginx 错误日志
+      tags:
+      - AdminOps
+  /api/admin/ops/summary:
+    get:
+      description: 只读读取配置指定的 Nginx access log，统计指定日期的访问量。
+      parameters:
+      - description: 日期，格式 YYYY-MM-DD
+        in: query
+        name: date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/app.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.OpsSummary'
+              type: object
+      summary: 管理员获取运维流量概览
+      tags:
+      - AdminOps
+  /api/admin/recommendMenuItem:
+    put:
+      consumes:
+      - application/json
+      description: 设置或取消菜品今日推荐。设置为推荐时会自动取消其它菜品的今日推荐，保证最多只有一个今日推荐菜品。
+      parameters:
+      - description: 今日推荐参数
+        in: body
+        name: recommend
+        required: true
+        schema:
+          $ref: '#/definitions/model.SetMenuRecommendationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: '{"code":400,"msg":"invalid params","data":"Invalid menu ID"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "404":
+          description: '{"code":404,"msg":"not found","data":"Menu item not found"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: '{"code":500,"msg":"internal server error","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 设置今日推荐菜品
+      tags:
+      - Menu
+  /api/admin/updateMenuItem:
+    put:
+      consumes:
+      - application/json
+      description: 根据菜品ID更新名称、简介、图片url、营养价值表和主要成分。图片url、营养价值表和主要成分可选，营养价值表和主要成分需要以JSON字符串格式提供。
+      parameters:
+      - description: 菜品信息
+        in: body
+        name: menu
+        required: true
+        schema:
+          $ref: '#/definitions/model.Menu'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":{"id":1,"name":"豆腐汤","image_url":"/images/tofusoup.jpg","desc":"清淡营养的素食汤品","nutrition":"...","ingredients":"...","status":1}}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: '{"code":400,"msg":"invalid params","data":"Name and description
+            are required"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "404":
+          description: '{"code":500,"msg":"fail","data":"Menu item not found"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: '{"code":500,"msg":"internal server error","data":null}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 更新菜品
+      tags:
+      - Menu
   /api/admin/uploadMenuItem:
     post:
       consumes:
       - application/json
-      description: 提供菜品的名称、图片url、简介、营养价值表、主要成分，上传到数据库。营养价值表和主要成分需要以JSON字符串格式提供。
+      description: 提供菜品的名称和简介，图片url、营养价值表、主要成分可选。营养价值表和主要成分需要以JSON字符串格式提供。
       parameters:
       - description: 菜品信息
         in: body
@@ -454,8 +1026,8 @@ paths:
           schema:
             $ref: '#/definitions/app.Response'
         "400":
-          description: '{"code":400,"msg":"invalid params","data":"All fields are
-            required"}'
+          description: '{"code":400,"msg":"invalid params","data":"Name and description
+            are required"}'
           schema:
             $ref: '#/definitions/app.Response'
         "500":

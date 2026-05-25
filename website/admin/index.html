@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <title>净莲阁维护后台</title>
+    <link rel="stylesheet" href="/admin/styles.css">
+</head>
+<body>
+    <main class="page">
+        <section class="login-view" id="loginView">
+            <div class="login-panel">
+                <p class="eyebrow">净莲阁维护后台</p>
+                <h1>日志与流量</h1>
+                <form id="loginForm" class="login-form">
+                    <label>
+                        <span>管理员账号</span>
+                        <input id="usernameInput" name="username" type="text" autocomplete="username" value="admin" required>
+                    </label>
+                    <label>
+                        <span>管理员密码</span>
+                        <input id="passwordInput" name="password" type="password" autocomplete="current-password" required>
+                    </label>
+                    <button type="submit" class="primary-btn">登录</button>
+                    <p id="loginError" class="error-text" aria-live="polite"></p>
+                </form>
+            </div>
+        </section>
+
+        <section class="dashboard-view hidden" id="dashboardView">
+            <header class="dashboard-header">
+                <div>
+                    <p class="eyebrow">净莲阁维护后台</p>
+                    <h1>日志与流量</h1>
+                </div>
+                <button id="logoutBtn" class="ghost-btn" type="button">退出</button>
+            </header>
+
+            <section class="toolbar">
+                <label>
+                    <span>日期</span>
+                    <input id="dateInput" type="date">
+                </label>
+                <label>
+                    <span>关键词</span>
+                    <input id="keywordInput" type="search" placeholder="路径、IP、状态码或日志内容">
+                </label>
+                <label>
+                    <span>应用日志级别</span>
+                    <select id="levelInput">
+                        <option value="">全部</option>
+                        <option value="INFO">INFO</option>
+                        <option value="WARN">WARN</option>
+                        <option value="ERROR">ERROR</option>
+                        <option value="DEBUG">DEBUG</option>
+                    </select>
+                </label>
+                <button id="refreshBtn" class="primary-btn" type="button">刷新</button>
+            </section>
+
+            <p id="statusText" class="status-text" aria-live="polite"></p>
+
+            <section class="metrics-grid" aria-label="流量概览">
+                <article class="metric-card">
+                    <p>今日请求</p>
+                    <strong id="totalRequests">0</strong>
+                </article>
+                <article class="metric-card">
+                    <p>独立 IP</p>
+                    <strong id="uniqueIps">0</strong>
+                </article>
+                <article class="metric-card">
+                    <p>4xx</p>
+                    <strong id="status4xx">0</strong>
+                </article>
+                <article class="metric-card">
+                    <p>5xx</p>
+                    <strong id="status5xx">0</strong>
+                </article>
+            </section>
+
+            <section class="charts-grid">
+                <article class="panel">
+                    <div class="panel-header">
+                        <h2>路径排行</h2>
+                    </div>
+                    <div id="topPaths" class="rank-list"></div>
+                </article>
+                <article class="panel">
+                    <div class="panel-header">
+                        <h2>状态码分布</h2>
+                    </div>
+                    <div id="statusCounts" class="rank-list compact"></div>
+                </article>
+            </section>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>访问日志</h2>
+                    <span id="accessSource" class="panel-note"></span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>IP</th>
+                                <th>方法</th>
+                                <th>路径</th>
+                                <th>状态</th>
+                                <th>UA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accessLogBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="logs-grid">
+                <article class="panel">
+                    <div class="panel-header">
+                        <h2>Nginx 错误日志</h2>
+                        <span id="errorSource" class="panel-note"></span>
+                    </div>
+                    <div id="errorLogs" class="text-log"></div>
+                </article>
+                <article class="panel">
+                    <div class="panel-header">
+                        <h2>后端应用日志</h2>
+                        <span id="appSource" class="panel-note"></span>
+                    </div>
+                    <div id="appLogs" class="text-log"></div>
+                </article>
+            </section>
+        </section>
+    </main>
+    <script src="/admin/app.js"></script>
+</body>
+</html>

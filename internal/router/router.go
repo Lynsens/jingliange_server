@@ -104,6 +104,11 @@ func InitRouter() *gin.Engine {
 		apiAdmin.PUT("/activity/update", admin.UpdateActivity)
 		apiAdmin.DELETE("/activity/delete", admin.DeleteActivity)
 		apiAdmin.PUT("/activity/top", admin.SetActivityTop)
+		// 只读运维维护面板
+		apiAdmin.GET("/ops/summary", admin.GetOpsSummary)
+		apiAdmin.GET("/ops/access-logs", admin.GetOpsAccessLogs)
+		apiAdmin.GET("/ops/error-logs", admin.GetOpsErrorLogs)
+		apiAdmin.GET("/ops/app-logs", admin.GetOpsAppLogs)
 	}
 
 	return r

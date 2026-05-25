@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 // GetSize get the file size
@@ -72,7 +73,10 @@ func MustOpen(fileName, filePath string) (*os.File, error) {
 		return nil, fmt.Errorf("os.Getwd err: %v", err)
 	}
 
-	src := dir + "/" + filePath
+	src := filePath
+	if !filepath.IsAbs(filePath) {
+		src = path.Join(dir, filePath)
+	}
 	perm := CheckPermission(src)
 	if perm == true {
 		return nil, fmt.Errorf("file.CheckPermission Permission denied src: %s", src)

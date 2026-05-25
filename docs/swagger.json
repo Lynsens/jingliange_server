@@ -12,6 +12,123 @@
     },
     "host": "49.234.22.169:8000",
     "paths": {
+        "/api/admin/archiveMenuItem": {
+            "put": {
+                "description": "设置菜品 archive 状态。下架今日推荐菜品时会自动取消今日推荐。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "下架或重新上架菜品",
+                "parameters": [
+                    {
+                        "description": "下架参数",
+                        "name": "archive",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ArchiveMenuRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/comment/delete": {
+            "delete": {
+                "description": "管理员删除评论仅清空评论内容，不影响用户点赞状态。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "管理员删除评论",
+                "parameters": [
+                    {
+                        "description": "删除参数",
+                        "name": "delete",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DeleteCommentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/comment/list": {
+            "post": {
+                "description": "管理员评论列表，可按评论内容、用户 ID、菜品名称或 ID 搜索。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "管理员获取评论列表",
+                "parameters": [
+                    {
+                        "description": "查询参数",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AdminCommentListRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.AdminCommentItem"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/admin/deleteMenuItem": {
             "delete": {
                 "description": "根据菜品ID删除菜品（软删除，将状态标记为0）",
@@ -64,9 +181,423 @@
                 }
             }
         },
+        "/api/admin/login": {
+            "post": {
+                "description": "使用配置文件中的管理员账号登录，返回管理员JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "管理员登录",
+                "parameters": [
+                    {
+                        "description": "管理员登录参数",
+                        "name": "auth",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AdminLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"token\":\"...\",\"username\":\"admin\",\"role\":\"admin\"}}",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"请求参数错误\",\"data\":\"Username and password are required\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "{\"code\":20004,\"msg\":\"Token错误\",\"data\":\"Invalid username or password\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/menu/list": {
+            "post": {
+                "description": "管理员菜单列表，可查看上架中和已下架菜品。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "管理员获取菜单列表",
+                "parameters": [
+                    {
+                        "description": "查询参数",
+                        "name": "query",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AdminMenuListRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.MenuWithLikes"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/ops/access-logs": {
+            "get": {
+                "description": "只读读取配置指定的 Nginx access log。",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminOps"
+                ],
+                "summary": "管理员获取 Nginx 访问日志",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "日期，格式 YYYY-MM-DD",
+                        "name": "date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "最大返回条数，最多 500",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keyword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.OpsAccessLogResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/ops/app-logs": {
+            "get": {
+                "description": "只读读取配置指定的后端应用日志目录。",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminOps"
+                ],
+                "summary": "管理员获取后端应用日志",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "日期，格式 YYYY-MM-DD",
+                        "name": "date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "最大返回条数，最多 500",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "日志级别，例如 INFO、WARN、ERROR",
+                        "name": "level",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keyword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.OpsTextLogResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/ops/error-logs": {
+            "get": {
+                "description": "只读读取配置指定的 Nginx error log。",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminOps"
+                ],
+                "summary": "管理员获取 Nginx 错误日志",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "日期，格式 YYYY-MM-DD",
+                        "name": "date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "最大返回条数，最多 500",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keyword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.OpsTextLogResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/ops/summary": {
+            "get": {
+                "description": "只读读取配置指定的 Nginx access log，统计指定日期的访问量。",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminOps"
+                ],
+                "summary": "管理员获取运维流量概览",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "日期，格式 YYYY-MM-DD",
+                        "name": "date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/app.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.OpsSummary"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/recommendMenuItem": {
+            "put": {
+                "description": "设置或取消菜品今日推荐。设置为推荐时会自动取消其它菜品的今日推荐，保证最多只有一个今日推荐菜品。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "设置今日推荐菜品",
+                "parameters": [
+                    {
+                        "description": "今日推荐参数",
+                        "name": "recommend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SetMenuRecommendationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Invalid menu ID\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "{\"code\":404,\"msg\":\"not found\",\"data\":\"Menu item not found\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/updateMenuItem": {
+            "put": {
+                "description": "根据菜品ID更新名称、简介、图片url、营养价值表和主要成分。图片url、营养价值表和主要成分可选，营养价值表和主要成分需要以JSON字符串格式提供。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "更新菜品",
+                "parameters": [
+                    {
+                        "description": "菜品信息",
+                        "name": "menu",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Menu"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":{\"id\":1,\"name\":\"豆腐汤\",\"image_url\":\"/images/tofusoup.jpg\",\"desc\":\"清淡营养的素食汤品\",\"nutrition\":\"...\",\"ingredients\":\"...\",\"status\":1}}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Name and description are required\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "{\"code\":500,\"msg\":\"fail\",\"data\":\"Menu item not found\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "{\"code\":500,\"msg\":\"internal server error\",\"data\":null}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/admin/uploadMenuItem": {
             "post": {
-                "description": "提供菜品的名称、图片url、简介、营养价值表、主要成分，上传到数据库。营养价值表和主要成分需要以JSON字符串格式提供。",
+                "description": "提供菜品的名称和简介，图片url、营养价值表、主要成分可选。营养价值表和主要成分需要以JSON字符串格式提供。",
                 "consumes": [
                     "application/json"
                 ],
@@ -96,7 +627,7 @@
                         }
                     },
                     "400": {
-                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"All fields are required\"}",
+                        "description": "{\"code\":400,\"msg\":\"invalid params\",\"data\":\"Name and description are required\"}",
                         "schema": {
                             "$ref": "#/definitions/app.Response"
                         }
@@ -1049,11 +1580,20 @@
                     "description": "Creation time",
                     "type": "string"
                 },
+                "event_time": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
                 "img": {
                     "description": "Image address",
+                    "type": "string"
+                },
+                "is_top": {
+                    "type": "integer"
+                },
+                "place": {
                     "type": "string"
                 },
                 "status": {
@@ -1083,6 +1623,114 @@
                 }
             }
         },
+        "model.AdminCommentItem": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "create_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "menu_id": {
+                    "type": "integer"
+                },
+                "menu_name": {
+                    "type": "string"
+                },
+                "preference": {
+                    "type": "integer"
+                },
+                "update_time": {
+                    "type": "string"
+                },
+                "user_avatar_url": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_nickname": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.AdminCommentListRequest": {
+            "type": "object",
+            "properties": {
+                "keyword": {
+                    "description": "评论、用户 ID、菜品名称或 ID",
+                    "type": "string",
+                    "example": "好吃"
+                },
+                "page_number": {
+                    "description": "页码，从零开始",
+                    "type": "integer",
+                    "example": 0
+                },
+                "page_size": {
+                    "description": "每页数量",
+                    "type": "integer",
+                    "example": 20
+                }
+            }
+        },
+        "model.AdminLoginRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "\u003cadmin-password\u003e"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "admin"
+                }
+            }
+        },
+        "model.AdminMenuListRequest": {
+            "type": "object",
+            "properties": {
+                "archive_status": {
+                    "description": "all, active, archived",
+                    "type": "string",
+                    "example": "all"
+                },
+                "keyword": {
+                    "description": "菜单名称、介绍或 ID",
+                    "type": "string",
+                    "example": "紫菜汤"
+                },
+                "page_number": {
+                    "description": "页码，从零开始",
+                    "type": "integer",
+                    "example": 0
+                },
+                "page_size": {
+                    "description": "每页数量",
+                    "type": "integer",
+                    "example": 20
+                }
+            }
+        },
+        "model.ArchiveMenuRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "菜品ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_archived": {
+                    "description": "是否下架：0 上架，1 下架",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "model.AuthRequest": {
             "type": "object",
             "properties": {
@@ -1090,6 +1738,16 @@
                     "description": "用户ID（来自微信小程序）",
                     "type": "string",
                     "example": "user123"
+                }
+            }
+        },
+        "model.DeleteCommentRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "评论反馈 ID",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -1288,6 +1946,11 @@
         "model.Menu": {
             "type": "object",
             "properties": {
+                "archive_time": {
+                    "description": "下架时间",
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
                 "create_time": {
                     "description": "Creation time",
                     "type": "string",
@@ -1308,6 +1971,16 @@
                 "ingredients": {
                     "type": "string",
                     "example": "{\"米\", \"豆腐\"}"
+                },
+                "is_archived": {
+                    "description": "是否下架：0 上架，1 下架",
+                    "type": "integer",
+                    "example": 0
+                },
+                "is_recommended": {
+                    "description": "是否今日推荐：0 否，1 是",
+                    "type": "integer",
+                    "example": 1
                 },
                 "name": {
                     "description": "菜品名称",
@@ -1352,6 +2025,15 @@
                     "description": "菜品ID",
                     "type": "integer",
                     "example": 1
+                },
+                "user_avatar_url": {
+                    "type": "string",
+                    "example": "/uploads/images/avatar.jpg"
+                },
+                "user_nickname": {
+                    "description": "评论展示昵称",
+                    "type": "string",
+                    "example": "莲友"
                 }
             }
         },
@@ -1411,10 +2093,18 @@
                     "type": "string",
                     "example": "2012-1-1"
                 },
+                "user_avatar_url": {
+                    "type": "string",
+                    "example": "/uploads/images/avatar.jpg"
+                },
                 "user_id": {
-                    "description": "用户\t ID",
+                    "description": "用户 ID",
                     "type": "string",
                     "example": "user123"
+                },
+                "user_nickname": {
+                    "type": "string",
+                    "example": "莲友"
                 }
             }
         },
@@ -1451,6 +2141,11 @@
         "model.MenuWithLikes": {
             "type": "object",
             "properties": {
+                "archive_time": {
+                    "description": "下架时间",
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
                 "create_time": {
                     "description": "Creation time",
                     "type": "string",
@@ -1471,6 +2166,16 @@
                 "ingredients": {
                     "type": "string",
                     "example": "{\"米\", \"豆腐\"}"
+                },
+                "is_archived": {
+                    "description": "是否下架：0 上架，1 下架",
+                    "type": "integer",
+                    "example": 0
+                },
+                "is_recommended": {
+                    "description": "是否今日推荐：0 否，1 是",
+                    "type": "integer",
+                    "example": 1
                 },
                 "like_count": {
                     "description": "点赞数",
@@ -1501,6 +2206,11 @@
         "model.MenuWithUserLikes": {
             "type": "object",
             "properties": {
+                "archive_time": {
+                    "description": "下架时间",
+                    "type": "string",
+                    "example": "2012-1-1"
+                },
                 "create_time": {
                     "description": "Creation time",
                     "type": "string",
@@ -1521,6 +2231,16 @@
                 "ingredients": {
                     "type": "string",
                     "example": "{\"米\", \"豆腐\"}"
+                },
+                "is_archived": {
+                    "description": "是否下架：0 上架，1 下架",
+                    "type": "integer",
+                    "example": 0
+                },
+                "is_recommended": {
+                    "description": "是否今日推荐：0 否，1 是",
+                    "type": "integer",
+                    "example": 1
                 },
                 "like_count": {
                     "description": "点赞数",
@@ -1550,6 +2270,164 @@
                     "description": "Update time",
                     "type": "string",
                     "example": "2012-1-1"
+                }
+            }
+        },
+        "model.OpsAccessLogItem": {
+            "type": "object",
+            "properties": {
+                "bytes": {
+                    "type": "integer"
+                },
+                "ip": {
+                    "type": "string"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "protocol": {
+                    "type": "string"
+                },
+                "raw": {
+                    "type": "string"
+                },
+                "referer": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "user_agent": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.OpsAccessLogResponse": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.OpsAccessLogItem"
+                    }
+                },
+                "source_exists": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.OpsPathStat": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.OpsStatusStat": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.OpsSummary": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "source_exists": {
+                    "type": "boolean"
+                },
+                "status_4xx": {
+                    "type": "integer"
+                },
+                "status_5xx": {
+                    "type": "integer"
+                },
+                "status_counts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.OpsStatusStat"
+                    }
+                },
+                "top_paths": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.OpsPathStat"
+                    }
+                },
+                "total_bytes": {
+                    "type": "integer"
+                },
+                "total_requests": {
+                    "type": "integer"
+                },
+                "unique_ips": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.OpsTextLogItem": {
+            "type": "object",
+            "properties": {
+                "level": {
+                    "type": "string"
+                },
+                "raw": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.OpsTextLogResponse": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.OpsTextLogItem"
+                    }
+                },
+                "source_exists": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.SetMenuRecommendationRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "菜品ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_recommended": {
+                    "description": "是否设为今日推荐：0 否，1 是",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         }

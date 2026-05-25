@@ -59,6 +59,14 @@ type Admin struct {
 
 var AdminSetting = &Admin{}
 
+type Ops struct {
+	NginxAccessLogPath string
+	NginxErrorLogPath  string
+	AppLogDir          string
+}
+
+var OpsSetting = &Ops{}
+
 type Redis struct {
 	Host        string
 	Password    string
@@ -90,6 +98,7 @@ func Setup() {
 	mapTo("server", ServerSetting)
 	mapTo("database", DatabaseSetting)
 	mapTo("admin", AdminSetting)
+	mapTo("ops", OpsSetting)
 	mapTo("redis", RedisSetting)
 
 	AppSetting.ImageMaxSize = AppSetting.ImageMaxSize * 1024 * 1024

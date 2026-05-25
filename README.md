@@ -76,6 +76,7 @@ cp conf/app_test.example.ini conf/app_test.ini
 - `[database]`：配置 MySQL 连接信息。
 - `[app]`：配置 `JwtSecret`、`JwtExpire`、端口和运行时目录。
 - `[admin]`：配置管理员用户名和 bcrypt 密码哈希。
+- `[ops]`：配置只读维护后台可读取的 Nginx 和后端应用日志路径。
 
 管理员账号：
 - 用户名：`admin`
@@ -207,6 +208,10 @@ mysql -h 49.234.22.169 -P 3306 -u jlg_test -p jlg_test \
 - `PUT /api/admin/activity/update` - 更新活动
 - `DELETE /api/admin/activity/delete` - 删除活动
 - `PUT /api/admin/activity/top` - 设置或取消活动置顶
+- `GET /api/admin/ops/summary` - 运维流量概览，只读读取配置指定的 access log
+- `GET /api/admin/ops/access-logs` - Nginx 访问日志列表
+- `GET /api/admin/ops/error-logs` - Nginx 错误日志列表
+- `GET /api/admin/ops/app-logs` - 后端应用日志列表
 
 ### 其他接口
 - `GET /api/v1/about/getDescription` - 获取关于信息
@@ -264,7 +269,9 @@ mysql -h 49.234.22.169 -P 3306 -u jlg_test -p jlg_test \
 
 ### 官网静态页
 - `website/index.html` 是 `https://jingliange.com` 的静态首页源文件。
+- `website/admin/` 是 `https://jingliange.com/admin/` 的只读维护后台源文件。
 - 服务器部署路径是 `/var/www/jingliange.com/index.html`。
+- 维护后台部署路径是 `/var/www/jingliange.com/admin/`。
 - 更新线上文件前先备份当前 HTML，例如：
 
 ```bash
@@ -275,6 +282,12 @@ sudo nginx -t
 ```
 
 - 当前只展示工信部 ICP 备案号；没有公安备案号时不要添加公安备案占位或虚假编号。
+
+### 维护后台
+- 维护后台复用管理员登录接口 `POST /api/admin/login` 和 AdminJWT。
+- 第一版只读展示日志和流量，不提供重启服务、删除日志、清理文件或修改配置功能。
+- 后端只读取 `[ops]` 配置中指定的日志路径，不接受任意文件路径参数。
+- 生产环境需要确保运行后端服务的用户对 `/var/log/nginx/jingliange.com_access.log` 和 `/var/log/nginx/jingliange.com_error.log` 有只读权限。
 
 ### 代码规范
 - 使用有意义的变量和函数名
