@@ -378,6 +378,9 @@ definitions:
       id:
         example: 1
         type: integer
+      is_mine:
+        example: true
+        type: boolean
       menu_id:
         description: 菜单 ID
         example: 1
@@ -1350,11 +1353,40 @@ paths:
       summary: 菜品评论
       tags:
       - Menu
+  /api/v1/menu/comment/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 用户只能删除自己的评论；删除评论不影响点赞状态。
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 删除参数
+        in: body
+        name: delete
+        required: true
+        schema:
+          $ref: '#/definitions/model.DeleteCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"comment deleted successfully"}'
+          schema:
+            $ref: '#/definitions/app.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除自己的菜品评论
+      tags:
+      - Menu
   /api/v1/menu/getComments:
     post:
       consumes:
       - application/json
-      description: 获取指定菜品的评论列表，支持分页
+      description: 获取指定菜品的评论列表，支持分页；带用户 token 时当前用户评论优先展示。
       parameters:
       - description: 查询参数
         in: body
@@ -1366,7 +1398,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"msg":"ok","data":[{"id":1,"menu_id":1,"user_id":"user123","preference":1,"comment":"非常好吃！","status":1}]}'
+          description: '{"code":200,"msg":"ok","data":[{"id":1,"menu_id":1,"user_id":"user123","preference":1,"comment":"非常好吃！","status":1,"is_mine":true}]}'
           schema:
             allOf:
             - $ref: '#/definitions/app.Response'

@@ -28,6 +28,7 @@ type MenuFeedback struct {
 	Status        uint      `json:"status" gorm:"type:int unsigned;not null;default:0" example:"1"`                                                   // 状态：0 删除，1 正常
 	CreateTime    time.Time `json:"create_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"` // Creation time
 	UpdateTime    time.Time `json:"update_time" gorm:"type:bigint(20);precision:19;scale:0;default:CURRENT_TIMESTAMP(3);not null" example:"2012-1-1"` // Update time
+	IsMine        bool      `json:"is_mine" gorm:"-" example:"true"`
 }
 
 // AdminCommentItem 管理员评论列表项

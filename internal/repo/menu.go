@@ -5,6 +5,7 @@ import (
 
 	"github.com/lynsens/jingliange_server/internal/model"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type MenuDB struct {
@@ -321,18 +322,37 @@ func (m *MenuDB) CommentMenu(menuID int, userID string, comment string, userNick
 	}
 }
 
-func (m *MenuDB) GetMenuComments(menuID int, pageSize, pageNumber int) ([]model.MenuFeedback, error) {
+func (m *MenuDB) GetMenuComments(menuID int, pageSize, pageNumber int, currentUserID string) ([]model.MenuFeedback, error) {
 	var comments []model.MenuFeedback
 	offset := pageNumber * pageSize
 
-	err := m.db.Table("menu_feedback").
+	query := m.db.Table("menu_feedback").
 		Where("menu_id = ? AND status = ? AND comment != ?", menuID, 1, "").
-		Order("create_time DESC").
 		Offset(offset).
-		Limit(pageSize).
-		Find(&comments).Error
+		Limit(pageSize)
 
-	return comments, err
+	if currentUserID != "" {
+		query = query.Order(clause.OrderBy{
+			Expression: clause.Expr{
+				SQL:                "CASE WHEN user_id = ? THEN 0 ELSE 1 END",
+				Vars:               []interface{}{currentUserID},
+				WithoutParentheses: true,
+			},
+		})
+	}
+
+	err := query.
+		Order("update_time DESC").
+		Find(&comments).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range comments {
+		comments[i].IsMine = currentUserID != "" && comments[i].UserID == currentUserID
+	}
+
+	return comments, nil
 }
 
 func (m *MenuDB) GetMenuCommentCount(menuID int) (int64, error) {
@@ -369,6 +389,19 @@ func (m *MenuDB) ClearMenuComment(id int) error {
 	return m.db.Table("menu_feedback").
 		Where("id = ? AND status = ?", id, 1).
 		Update("comment", "").Error
+}
+
+func (m *MenuDB) ClearOwnMenuComment(id int, userID string) error {
+	result := m.db.Table("menu_feedback").
+		Where("id = ? AND user_id = ? AND status = ?", id, userID, 1).
+		Update("comment", "")
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 func (m *MenuDB) GetMenuByIDWithLikes(id int) (model.MenuWithLikes, error) {

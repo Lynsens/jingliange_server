@@ -1149,9 +1149,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/menu/comment/delete": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "用户只能删除自己的评论；删除评论不影响点赞状态。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "删除自己的菜品评论",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "删除参数",
+                        "name": "delete",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DeleteCommentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":\"comment deleted successfully\"}",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/menu/getComments": {
             "post": {
-                "description": "获取指定菜品的评论列表，支持分页",
+                "description": "获取指定菜品的评论列表，支持分页；带用户 token 时当前用户评论优先展示。",
                 "consumes": [
                     "application/json"
                 ],
@@ -1175,7 +1221,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"menu_id\":1,\"user_id\":\"user123\",\"preference\":1,\"comment\":\"非常好吃！\",\"status\":1}]}",
+                        "description": "{\"code\":200,\"msg\":\"ok\",\"data\":[{\"id\":1,\"menu_id\":1,\"user_id\":\"user123\",\"preference\":1,\"comment\":\"非常好吃！\",\"status\":1,\"is_mine\":true}]}",
                         "schema": {
                             "allOf": [
                                 {
@@ -2076,6 +2122,10 @@ const docTemplate = `{
                 "id": {
                     "type": "integer",
                     "example": 1
+                },
+                "is_mine": {
+                    "type": "boolean",
+                    "example": true
                 },
                 "menu_id": {
                     "description": "菜单 ID",

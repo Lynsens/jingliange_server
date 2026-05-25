@@ -44,8 +44,6 @@ func InitRouter() *gin.Engine {
 		apiv1.POST("/about/getImageList", v1.GetImangeList)
 		//获取单个菜品信息
 		apiv1.POST("/menu/getMenuByID", v1.GetMenuByID)
-		//获取菜品评论列表
-		apiv1.POST("/menu/getComments", v1.GetMenuComments)
 		//获取功德榜列表
 		apiv1.POST("/donation/getDonationList", v1.GetDonationList)
 		//获取捐款统计
@@ -62,6 +60,8 @@ func InitRouter() *gin.Engine {
 	{
 		//获取菜单（支持显示用户点赞状态）
 		apiOptional.POST("/menu/getMenu", v1.GetMenu)
+		//获取菜品评论列表（支持当前用户评论置顶）
+		apiOptional.POST("/menu/getComments", v1.GetMenuComments)
 	}
 
 	// 需要认证的接口
@@ -74,6 +74,8 @@ func InitRouter() *gin.Engine {
 		apiAuth.POST("/menu/getLikeStatus", v1.GetMenuLikeStatus)
 		//菜品评论
 		apiAuth.POST("/menu/comment", v1.CommentMenu)
+		//删除自己的菜品评论
+		apiAuth.DELETE("/menu/comment/delete", v1.DeleteMenuComment)
 		//创建捐款记录
 		apiAuth.POST("/donation/createDonation", v1.CreateDonation)
 	}
