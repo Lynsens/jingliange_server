@@ -2,6 +2,7 @@ package repo
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/lynsens/jingliange_server/pkg/logging"
@@ -12,8 +13,16 @@ import (
 )
 
 var DB *gorm.DB
+var dbMu sync.Mutex
 
 func ConnectDb() (*gorm.DB, error) {
+	dbMu.Lock()
+	defer dbMu.Unlock()
+
+	if DB != nil {
+		return DB, nil
+	}
+
 	username := setting.DatabaseSetting.User
 	password := setting.DatabaseSetting.Password
 	host := setting.DatabaseSetting.Host
@@ -38,6 +47,16 @@ func ConnectDb() (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
+
+	sqlDB, err := DB.DB()
+	if err != nil {
+		DB = nil
+		return nil, fmt.Errorf("failed to get database pool: %w", err)
+	}
+	sqlDB.SetMaxOpenConns(20)
+	sqlDB.SetMaxIdleConns(5)
+	sqlDB.SetConnMaxLifetime(30 * time.Minute)
+	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
 
 	return DB, nil
 }
